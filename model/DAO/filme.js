@@ -1,7 +1,7 @@
 /**********************************************************************************************************************************
 * Objetivo: Criar a intereação com o banco de dados MYSQL para fazer o CRUD de filmes                                             *
 * Data: 30/01/24                                                                                                                  *
-* Autor: Matheus Zanoni                                                                                                           *
+* Autor: Alice Zeurgo*
 * Versão: 1.0                                                                                                                     * 
 ***********************************************************************************************************************************/
 
@@ -16,7 +16,12 @@ const insertFilme = async function(dadosFilme){
     // Script SQL para inserir no banco de dados
     try {
 
-        if(dadosFilme.data_relancamento == null || dadosFilme.data_relancamento == undefined || dadosFilme.data_relancamento == ''){
+        let sql;
+
+        if(dadosFilme.data_relancamento == null || 
+            dadosFilme.data_relancamento == undefined || 
+            dadosFilme.data_relancamento == ''){
+
             let sql = `insert into tbl_filme'(
                 nome,
                 sinopse,
@@ -65,7 +70,7 @@ const deleteFilme = async function(id){
 const selectAllFilmes = async function(){
     
     // Script SQL para listar todos os registros
-    let sql = 'select * from tbl_filme'
+    let sql = 'select * from tbl_filme order by id desc'  
  
     // Executa o scriptSQL no BD e recebe o retorno dos daods na variável rsFilmes
     let rsFilmes = await prisma.$queryRawUnsafe(sql)

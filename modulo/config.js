@@ -6,6 +6,7 @@
  *********************************************************************************************************************/
 
 /******************************* MENSAGENS DE ERRO****************************************/
+
 const ERROR_INVALID_ID = {status: false, status_code: 400, message: 'O ID encaminhado na requisição não é valido!!!!'}
 const ERROR_NOT_FOUND = {status: false, status_code: 404 ,message: 'Nenhum item encontrado na requisição'}
 const ERROR_INTERNAL_SERVER_DB = {status: false, status_code: 500 ,message: 'Ocorreram erros internos no servidor de banco de dados, por favor contate o administrador do sistema'}
@@ -19,6 +20,7 @@ const SUCCESS_CREATED_ITEM = {status: true, status_code: 201, message: 'Item Ins
 
 
 module.exports = {
+
     ERROR_INVALID_ID,
     ERROR_NOT_FOUND,
     ERROR_INTERNAL_SERVER_DB,

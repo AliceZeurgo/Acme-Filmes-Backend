@@ -1,7 +1,7 @@
 /**********************************************************************************************************************************************
 * Objetivo: Arquivo responsavel pela interação entre o APP e a model, que teremos todas as tratativas e regra de negocio para o CRUD de filmes*                                                 *                                                                     *
 * Data: 30/01/24                                                                                                                              *
-* Autor: Matheus Zanoni Barbosa                                                                                                                         *
+* Autor: Alice Zeurgo                                                                                                                        *
 * Versão: 1.0                                                                                                                                 * 
 ***********************************************************************************************************************************************/
 
@@ -30,7 +30,24 @@ const setInserirNovoFilme = async function (dadosFilme) {
         return message.ERROR_REQUIRED_FIELDS // 400 Campos obrigatórios / Incorretos
     } else {
 
-        // Encaminha os dados para o DAO inserir no BD
+
+        let dadosValitaded= false;
+
+        if (
+               dadosFilme.data_lancamento != null &&
+               dadosFilme.data_relancamento != undefined &&
+               dadosFilme.data_relancamento != ""
+        ){
+            if(dadosFilme.data_relancamento.length != 10)
+            return message.ERROR_REQUIRED_FIELDS; // 400 CAMPOS OBRIGATORIOS / INCORRETOS
+                    else
+            dadosValitaded = true // Se a data estiver com exatamente 10 char
+        }else{
+            dadosValitaded = true // Se a data existir nos dados
+            
+    }
+        
+// Encaminha os dados para o DAO inserir no BD
         let novoFilme = await filmesDAO.insertFilme(dadosFilme) 
 
         // Validação para verificar se os dados foram inseridos pelo DAO no BD
@@ -44,16 +61,11 @@ const setInserirNovoFilme = async function (dadosFilme) {
             return resultDadosFilme
         } else {
             return message.ERROR_INTERNAL_SERVER_BD // 500 Erro na camada do DAO
-        }
-            
-    }
-        
-
-}
+        }}
 
 // Função para atualizar Filme existente 
 const setAtualizarFilme = async function () {
-
+    
 }
 
 // Função para excluir um filme existente
@@ -120,5 +132,4 @@ module.exports = {
     setExcluirFilme,
     getListarFilmes,
     getBuscarFilme
-}
- 
+}}

@@ -83,11 +83,6 @@ app.get('/v2/acmefilmes/filme/:id', cors(), async function(request, response, ne
     response.json(dadosFilme)
 })
 
-// mariana alves de sousa !! 
-// matheusssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-// deixaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-// de ser chato #ficalegalmatheus *emoji de joinha*
-
 // EndPoint: Inserir novos filmes no BD
 
 // Não esquecer de colocar o bodyparserJSOn que é quem define o formato de chegada dos
