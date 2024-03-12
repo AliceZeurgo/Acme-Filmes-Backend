@@ -1,7 +1,7 @@
 /**********************************************************************************************************************************
 * Objetivo: Arquivo para realizar as requisições                                                                                  *
 * Data: 30/01/24                                                                                                                  *
-* Autor: Matheus Zanoni
+* Autor: Alice Zeurgo                                                                                                             *
 * Versão: 1.0                                                                                                                     * 
 ***********************************************************************************************************************************/
 
@@ -86,12 +86,18 @@ app.get('/v2/acmefilmes/filme/:id', cors(), async function(request, response, ne
 // EndPoint: Inserir novos filmes no BD
 
 // Não esquecer de colocar o bodyparserJSOn que é quem define o formato de chegada dos
-app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request, response, next){
+app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request, response){
+ 
+    //Api recebe o content-type (API DEVE RECEBER SOMENTE application/json)
+    let contentType = request.headers['content-type']
+
+
+
     // Recebe os dados encaminhados na requisição no body( JSON)
     let dadosBody = request.body
 
-    let resultDados = await controllerFilmes.setInserirNovoFilme(bodyParser)
-
+    let resultDados = await controllerFilmes.setInserirNovoFilme(dadosBody, contentType)
+   console.log(resultDados)
     response.status(resultDados.status_code)
     response.json(resultDados)
 })
