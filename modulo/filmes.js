@@ -11,6 +11,7 @@ var filmes = {
         "valor_unitario": 29.99
       },
       {
+
 		"id": 2,  
         "nome": "A Herança Perdida",
         "sinopse": "Um filme de suspense que segue a jornada de um herdeiro em busca de seu passado misterioso.",

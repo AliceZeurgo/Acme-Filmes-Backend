@@ -10,7 +10,7 @@
  *     - SEQUELIZE ORM
  *     - PRISMA ORM
  *     - FASTFY ORM
- *  
+ * 
  * - Prisma
  *      npm install prisma --save
  *      npm install @prisma/client --save
@@ -100,6 +100,16 @@ app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request,
    console.log(resultDados)
     response.status(resultDados.status_code)
     response.json(resultDados)
+})
+
+app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,response,next){
+
+    let idFilme = request.params.id
+
+    let dadosFilme = await controllerFilmes.setExcluirFilme(idFilme);
+
+    response.status(dadosFilme.status_code);
+    response.json(dadosFilme);
 })
 
 app.listen('8080', function(){
