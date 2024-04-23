@@ -19,14 +19,14 @@ const insertFilme = async function () {
             dadosFilme.data_relancamento != null &&
             dadosFilme.data_relancamento != undefined) {
 
-            sql = `insert into tbl_filme (
+            sql = `insert into filmes (
                 nome,
                 sinopse,
                 duracao,
                 data_lancamento,
                 data_relancamento,
                 foto_capa,
-                valor_unitario
+                valor
 
             ) values(
                     '${dadosFilme.nome}',
@@ -35,7 +35,7 @@ const insertFilme = async function () {
                     '${dadosFilme.data_lancamento}',
                     '${dadosFilme.data_relancamento}',
                     '${dadosFilme.foto_capa}',
-                    '${dadosFilme.valor_unitario}'
+                    '${dadosFilme.valor}'
             )`
 
             let result = await prisma.$executeRawUnsafe(sql)
@@ -46,7 +46,7 @@ const insertFilme = async function () {
 
         } else {
 
-            sql = `insert into tbl_filme (
+            sql = `insert into filmes (
                 nome,
                 sinopse,
                 duracao,
@@ -62,7 +62,7 @@ const insertFilme = async function () {
                     '${dadosFilme.data_lancamento}',
                     null,
                     '${dadosFilme.foto_capa}',
-                    '${dadosFilme.valor_unitario}'
+                '${dadosFilme.valor}'
 
                     )`
 
@@ -99,7 +99,7 @@ const updateFilme = async function (id) {
                     data_lancamento = '${dadosFilme.data_lancamento}',
                     data_relancamento = '${dadosFilme.data_relancamento}',
                     foto_capa = '${dadosFilme.foto_capa}',
-                    valor_unitario  = '${dadosFilme.valor_unitario}' 
+                    valor  = '${dadosFilme.valor}' 
                     where tbl_filme.id = ${id}; `
             } else {
                 sql = `UPDATE tbl_filme SET  nome = '${dadosFilme.nome}',
@@ -108,7 +108,7 @@ const updateFilme = async function (id) {
                     data_lancamento = '${dadosFilme.data_lancamento}',
                     data_relancamento = null ,
                     foto_capa = '${dadosFilme.foto_capa}',
-                    valor_unitario  = '${dadosFilme.valor_unitario}' 
+                    valor = '${dadosFilme.valor}' 
                      where tbl_filme.id = ${id}; `
             }
 
@@ -132,7 +132,7 @@ const updateFilme = async function (id) {
 //excluir um fime existente filrando pelo ID.
 const deleteFilme = async function (id){
     try {
-        let sql = `DELETE FROM tbl_filme WHERE tbl_filme.id = ${id}`;
+        let sql = `DELETE FROM filmes WHERE filme.id = ${id}`;
 
         let rsFilme = await prisma.$queryRawUnsafe(sql);
 
@@ -148,7 +148,7 @@ const deleteFilme = async function (id){
     const selectAllFilmes = async function () {
 
         //script sql para listar todos o registros.
-        let sql = 'select * from tbl_filme';
+        let sql = 'select * from filmes';
 
         //$queryRawUnsafe() --- encaminha apenas a variavel.
         //$queryRaw('select * from tbl_filme) --- encaminha o script.
@@ -167,7 +167,7 @@ const deleteFilme = async function (id){
     //buscar todos os filmes existentes fitrando pelo ID.
     const selectByIdFilme = async function (id) {
         try {
-            let sql = `select * from tbl_filme where id=${id}`
+            let sql = `select * from filmes where id=${id}`
             let rsFilme = await prisma.$queryRawUnsafe(sql)
             return rsFilme
         }
@@ -182,7 +182,7 @@ const deleteFilme = async function (id){
         let nomeFilme = nome
 
         try {
-            let sql = `select * from tbl_filme where nome like "%${nomeFilme}%"`
+            let sql = `select * from filmes where nome like "%${nomeFilme}%"`
             let rsFilmes = await prisma.$queryRawUnsafe(sql)
             return rsFilmes
         }
@@ -195,7 +195,7 @@ const deleteFilme = async function (id){
     const selectLastIDFilme = async function () {
 
         try {
-            let sql = 'select cast(last_insert_id() as decimal) as id from tbl_filme limit 1;'
+            let sql = 'select cast(last_insert_id() as decimal) as id from filmes limit 1;'
             let rsID = await prisma.$queryRawUnsafe(sql)
             console.log(rsID)
             return rsID
