@@ -93,7 +93,7 @@ const updateFilme = async function (id) {
                 dadosFilme.data_relancamento != undefined
             ) {
 
-                sql = `UPDATE tbl_filme SET nome = ${dadosFilme.nome},
+                sql = `UPDATE filmes SET nome = ${dadosFilme.nome},
                     sinopse = '${dadosFilme.sinopse}',
                     duracao = '${dadosFilme.duracao}',
                     data_lancamento = '${dadosFilme.data_lancamento}',
@@ -102,7 +102,7 @@ const updateFilme = async function (id) {
                     valor  = '${dadosFilme.valor}' 
                     where tbl_filme.id = ${id}; `
             } else {
-                sql = `UPDATE tbl_filme SET  nome = '${dadosFilme.nome}',
+                sql = `UPDATE filmes SET  nome = '${dadosFilme.nome}',
                     sinopse = '${dadosFilme.sinopse}',
                     duracao = '${dadosFilme.duracao}',
                     data_lancamento = '${dadosFilme.data_lancamento}',

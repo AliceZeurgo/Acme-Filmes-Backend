@@ -2,7 +2,7 @@ const bancoDeDados = require('./bancoDeDados');
 
 const buscarAtoresPorFilmeId = async (id_filme) => {
     try {
-        const query = `select tbl_ator.nome from tbl_ator inner join tbl_elenco on tbl_ator.id = tbl_elenco.id_ator where tbl_elenco.id_filme = ${id_filme}`;
+        const query = `select atores.nome from ator inner join elenco on atores.id = elenco.id_atores where elenco.id_filme = ${id_filme}`;
         return await db.$queryRawUnsafe(query);
     } catch (error) {
         console.error("Erro ao buscar atores por ID do filme:", error);
@@ -12,7 +12,7 @@ const buscarAtoresPorFilmeId = async (id_filme) => {
 
 const buscarTodosAtores = async () => {
     try {
-        return await db.$queryRawUnsafe('select * from tbl_ator');
+        return await db.$queryRawUnsafe('select * from atores');
     } catch (error) {
         console.error("Erro ao buscar todos os atores:", error);
         return false;
@@ -21,7 +21,7 @@ const buscarTodosAtores = async () => {
 
 const buscarAtorPorId = async (id) => {
     try {
-        return await db.$queryRawUnsafe(`select * from tbl_ator where id = ${id}`);
+        return await db.$queryRawUnsafe(`select * from atores where id = ${id}`);
     } catch (error) {
         console.error("Erro ao buscar ator por ID:", error);
         return false;
@@ -30,7 +30,7 @@ const buscarAtorPorId = async (id) => {
 
 const buscarUltimoIdAtor = async () => {
     try {
-        return await db.$queryRawUnsafe('select cast(id as decimal) from tbl_ator order by id desc limit 1');
+        return await db.$queryRawUnsafe('select cast(id as decimal) from atores order by id desc limit 1');
     } catch (error) {
         console.error("Erro ao buscar o ID do último ator:", error);
         return false;
@@ -39,7 +39,7 @@ const buscarUltimoIdAtor = async () => {
 
 const inserirAtor = async ({ nome, biografia, data_nascimento, foto_url, id_sexo }) => {
     try {
-        const query = `insert into tbl_ator (nome, biografia, data_nascimento, foto_url, id_sexo) values ('${nome}', '${biografia}', '${data_nascimento}', '${foto_url || ''}', ${id_sexo})`;
+        const query = `insert into atores (nome, biografia, data_nascimento, foto_url) values ('${nome}', '${biografia}', '${data_nascimento}', '${foto_url || ''})`;
         return !!(await db.$executeRawUnsafe(query));
     } catch (error) {
         console.error("Erro ao inserir um novo ator:", error);
@@ -49,7 +49,7 @@ const inserirAtor = async ({ nome, biografia, data_nascimento, foto_url, id_sexo
 
 const deletarAtor = async (id) => {
     try {
-        const query = `delete from tbl_ator where id = ${id}`;
+        const query = `delete from atores where id = ${id}`;
         return await db.$queryRawUnsafe(query);
     } catch (error) {
         console.error("Erro ao deletar ator:", error);
@@ -57,9 +57,9 @@ const deletarAtor = async (id) => {
     }
 };
 
-const atualizarAtor = async ({ id, nome, biografia, data_nascimento, foto_url, id_sexo }) => {
+const atualizarAtor = async ({ id, nome, biografia, data_nascimento, foto_url}) => {
     try {
-        const query = `update tbl_ator set nome = '${nome}', biografia = '${biografia}', data_nascimento = '${data_nascimento}', foto_url = '${foto_url || ''}', id_sexo = ${id_sexo} where id = ${id}`;
+        const query = `update tbl_ator set nome = '${nome}', biografia = '${biografia}', data_nascimento = '${data_nascimento}', foto_url = '${foto_url || ''}',`;
         return !!(await db.$executeRawUnsafe(query));
     } catch (error) {
         console.error("Erro ao atualizar ator:", error);

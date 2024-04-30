@@ -2,7 +2,7 @@ const bancoDeDados = require('./bancoDeDados');
 
 const buscarTodasClassificacoes = async () => {
     try {
-        return await db.$queryRawUnsafe('select * from tbl_classificacao');
+        return await db.$queryRawUnsafe('select * from classificacao');
     } catch (error) {
         console.error("Erro ao buscar todas as classificações:", error);
         return false;
@@ -11,7 +11,7 @@ const buscarTodasClassificacoes = async () => {
 
 const buscarClassificacaoPorId = async (id) => {
     try {
-        return await db.$queryRawUnsafe(`select * from tbl_classificacao where id = ${id}`);
+        return await db.$queryRawUnsafe(`select * from classificacao where id = ${id}`);
     } catch (error) {
         console.error("Erro ao buscar classificação por ID:", error);
         return false;
@@ -20,16 +20,16 @@ const buscarClassificacaoPorId = async (id) => {
 
 const buscarUltimoIdClassificacao = async () => {
     try {
-        return await db.$queryRawUnsafe('select cast(id as decimal) from tbl_classificacao order by id desc limit 1');
+        return await db.$queryRawUnsafe('select cast(id as decimal) from classificacao order by id desc limit 1');
     } catch (error) {
         console.error("Erro ao buscar o ID da última classificação:", error);
         return false;
     }
 };
 
-const inserirClassificacao = async ({ nome, descricao, icone_sigla }) => {
+const inserirClassificacao = async ({ nome_classificacao, descricao_classificacao, sigla_classificacao }) => {
     try {
-        const query = `insert into tbl_classificacao (nome, descricao, icone_sigla) values ('${nome}', '${descricao}', '${icone_sigla}')`;
+        const query = `insert intoclassificacao (nome_classificacao, descricao_classificacao, sigla_classificacao) values ('${nome_classificacao}', '${descricao_classificacao}', '${icone_sigla}')`;
         return !!(await db.$executeRawUnsafe(query));
     } catch (error) {
         console.error("Erro ao inserir uma nova classificação:", error);
@@ -39,7 +39,7 @@ const inserirClassificacao = async ({ nome, descricao, icone_sigla }) => {
 
 const deletarClassificacao = async (id) => {
     try {
-        const query = `delete from tbl_classificacao where id = ${id}`;
+        const query = `delete from classificacao where id = ${id}`;
         return await db.$queryRawUnsafe(query);
     } catch (error) {
         console.error("Erro ao deletar classificação:", error);
@@ -47,9 +47,9 @@ const deletarClassificacao = async (id) => {
     }
 };
 
-const atualizarClassificacao = async ({ id, foto_classificacao, nome, descricao, icone_sigla }) => {
+const atualizarClassificacao = async ({ id, nome_classificacao, descricao_classificacao, sigla_classificacao }) => {
     try {
-        const query = `update tbl_classificacao set foto_classificacao = '${foto_classificacao}', nome = '${nome}', descricao = '${descricao}', icone_sigla = '${icone_sigla}' where id = ${id}`;
+        const query = `update classificacao set nome = '${nome_classificacao}', descricao = '${descricao_classificacao}', sigla_classificacao = '${sigla_classificacao}' where id = ${id}`;
         return !!(await db.$executeRawUnsafe(query));
     } catch (error) {
         console.error("Erro ao atualizar classificação:", error);
