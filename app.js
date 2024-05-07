@@ -42,11 +42,14 @@ const bodyParserJSON = bodyParser.json();
 /******************************** Imports de arquivos e bibliotecas do Projeto *********************************/
 
 const controllerFilmes = require('./controller/controller_filme.js')
+const controllerDiretores = require('./controller/controller_diretores.js')
 const controllerUsuarios = require('./controller/controller_usuarios.js')
+const message  = require('./modulo/config.js')
+
 
 /***************************************************************************************************************/
 
-//EndPoint: Retorna os dados do arquivo JSON
+//EndPoint: Retorna os dados do arquivo JSON - ok
 app.get('/AcmeFilmes/filmes', async(request, response, next) => {
     let dadosFilmes = await controllerFilmes.getListarFilmes()
 
@@ -60,65 +63,42 @@ app.get('/AcmeFilmes/filmes', async(request, response, next) => {
     }
 })
 
-//EndPoint: Retorna os dados do Banco de Dados
-app.get('/v2/acmefilmes/filmes', cors(), async function(request, response, next){
-    
-    // Chama a função para retornar os dados do filme
-    let dadosFilmes = await controllerFilmes.getListarFilmes()
 
-    // Validação para verificar se existem dados
-    if (dadosFilmes){
-        response.status(200)
-        response.json(dadosFilmes)
-    } else {
-        response.status(404)
-        response.json({message: 'Nenhum registro encontrado'})
-        
-    }
-
-})
-
-//EndPoint: Retorna os dados do filme filtrando pelo ID
+//EndPoint: Retorna os dados do filme filtrando pelo ID - ok
 app.get('/v2/acmefilmes/filme/:id', cors(), async function(request, response, next){
-    // Recebe o ID da requisição do Filme
+    //Recebe o id encaminhado pela requisição 
     let idFilme = request.params.id
-    
-    // Solicita para a controller o Filme filtrando pelo ID
+    console.log("ID do filme recebido:", idFilme);
     let dadosFilme = await controllerFilmes.getBuscarFilme(idFilme)
-    console.log(dadosFilme)
-
-    response.status(dadosFilme)
+ 
+    response.status(dadosFilme.status_code)
     response.json(dadosFilme)
 })
 
 // EndPoint: Inserir novos filmes no BD
 
-// Não esquecer de colocar o bodyparserJSOn que é quem define o formato de chegada dos
+// Não esquecer de colocar o bodyparserJSOn que é quem define o formato de chegada dos - ok
 app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request, response){
- 
-    //Api recebe o content-type (API DEVE RECEBER SOMENTE application/json)
     let contentType = request.headers['content-type']
 
-
-
-    // Recebe os dados encaminhados na requisição no body( JSON)
     let dadosBody = request.body
 
-    let resultDados = await controllerFilmes.setInserirNovoFilme(dadosBody, contentType)
-   console.log(resultDados)
-    response.status(resultDados.status_code)
-    response.json(resultDados)
+    let resultDadosNovoFilme = await controllerFilmes.setInserirNovoFilme(dadosBody, contentType)
+
+    response.status(resultDadosNovoFilme.status_code)
+    response.json(resultDadosNovoFilme)
 })
 
+//delete -- okkkkkkkkkkkkkk
 app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,response,next){
 
     let idFilme = request.params.id
+    let dadosFilme = await controllerFilmes.setExcluirFilme(idFilme)
 
-    let dadosFilme = await controllerFilmes.setExcluirFilme(idFilme);
-
-    response.status(dadosFilme.status_code);
-    response.json(dadosFilme);
+    response.status(200)
+    response.json(dadosFilme)
 })
+
 
 
 app.get('/v2/acmefilmes/usuarios', cors(), async(request, response, next)=> {
@@ -134,6 +114,53 @@ app.get('/v2/acmefilmes/usuarios', cors(), async(request, response, next)=> {
     }
 
 })
+
+// app.put('/v1/acmefilmes/atualizar/:id', cors(), async function (request, response, next) {
+//     try {
+//         console.log("Requisição PUT recebida para atualizar o filme com ID:", request.params.id);
+//         console.log("Corpo da requisição:", request.body);
+
+//         let contentType = request.headers['content-type'];
+//         let idFilme = request.params.id;
+//         let dadosPut = request.body;
+
+//         // Restante do código...
+//     } catch (error) {
+//         console.error("Erro durante a atualização do filme:", error);
+//         response.status(500).json({
+//             "status": false,
+//             "status_code": 500,
+//             "message": "Ocorreram erros internos no servidor na camada de negócio da API, por favor contate o desenvolvedor"
+//         });
+//     }
+// });
+
+app.get('/v2/AcmeFilmes/diretores', async(request, response, next) => {
+    let dadosDiretores = await controllerDiretores.getListarDiretores()
+
+    if(dadosDiretores) {
+        response.json(dadosDiretores)
+        response.status(200)
+
+    } else {
+        response.json({message: 'Nenhum registro encontrado'})
+        response.status(400)
+    }
+})
+
+app.get('/v2/AcmeFilmes/diretores', async(request, response, next) => {
+    let dadosDiretores = await controllerDiretores.getListarDiretores()
+
+    if(dadosDiretores) {
+        response.json(dadosDiretores)
+        response.status(200)
+
+    } else {
+        response.json({message: 'Nenhum registro encontrado'})
+        response.status(400)
+    }
+})
+
 
 app.listen('8080', function(){
     console.log('API funcionando!!!')
