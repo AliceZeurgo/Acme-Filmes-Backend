@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 // ALICE QUE FEZ
 
-const buscarTodosUsuarios = async function{
+const buscarTodosUsuarios = async function(){
     try {
 
         let sql = `SELECT * FROM tbl_usuario`
