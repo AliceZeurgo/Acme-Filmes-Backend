@@ -114,7 +114,7 @@ app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,re
 })
 
 
-app.get('/v2/acmefilmes/usuarios', cors(), async(request, response, next){
+app.get('/v2/acmefilmes/usuarios', cors(), async(request, response, next)=> {
 
     let dadosUsuarios = await controllerUsuarios.getUsuarios()
 
