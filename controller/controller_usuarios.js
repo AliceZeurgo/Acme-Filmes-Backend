@@ -4,8 +4,8 @@ const message = require('../modulo/config')
 
 const getUsuarios = async function(){
 
-    jsonUsuarios = {}
-    dadosUsuarios = await usuariosDAO.buscarTodosUsuarios()
+    let jsonUsuarios = {}
+    let dadosUsuarios = await usuariosDAO.buscarTodosUsuarios()
 
     if(dadosUsuarios){
 
