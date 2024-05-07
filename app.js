@@ -29,8 +29,8 @@ const app = express()
 app.use((request, response, next) => {
 
     response.header('Access-Control-Allow-Origin', '*')
-    response.header('Access-Control-Allow-Methods', 'GET, POST')
-    app.use(cors)
+    response.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT')
+    app.use(cors())
 
     next()
 
@@ -41,7 +41,8 @@ const bodyParserJSON = bodyParser.json();
 
 /******************************** Imports de arquivos e bibliotecas do Projeto *********************************/
 
-    const controllerFilmes = require('./controller/controller_filme.js')
+const controllerFilmes = require('./controller/controller_filme.js')
+const controllerUsuarios = require('./controller/controller_usuarios.js')
 
 /***************************************************************************************************************/
 
@@ -110,6 +111,21 @@ app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,re
 
     response.status(dadosFilme.status_code);
     response.json(dadosFilme);
+})
+
+
+app.get('/v2/acmefilmes/usuarios', cors(), async(request, response, next){
+
+    let dadosUsuarios = await controllerUsuarios.getUsuarios()
+
+    if(dadosUsuarios){
+        response.json(dadosUsuarios)
+        response.status = 200
+    } else{
+        response.json({message: 'NADA ENCONTRADO'})
+        response.status(404)
+    }
+
 })
 
 app.listen('8080', function(){

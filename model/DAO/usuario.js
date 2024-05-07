@@ -1,11 +1,21 @@
-const bancoDeDados = require('./bancoDeDados');
+const { PrismaClient } = require('@prisma/client')
+
+
+const prisma = new PrismaClient()
+
+// ALICE QUE FEZ
 
 const buscarTodosUsuarios = async () => {
     try {
-        return await db.$queryRawUnsafe('select * from tbl_usuario');
+
+        let sql 
+        sql = `SELECT * FROM tbl_usuario`
+        rsUsuarios = await prisma.$queryRawUnsafe(sql)
+
+        return rsUsuarios
     } catch (error) {
-        console.error("Erro ao buscar todos os usuários:", error);
-        return false;
+
+        return false
     }
 };
 
