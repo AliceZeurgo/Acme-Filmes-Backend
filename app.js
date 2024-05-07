@@ -48,9 +48,16 @@ const controllerUsuarios = require('./controller/controller_usuarios.js')
 
 //EndPoint: Retorna os dados do arquivo JSON
 app.get('/AcmeFilmes/filmes', async(request, response, next) => {
+    let dadosFilmes = await controllerFilmes.getListarFilmes()
 
-    response.status(200)
-    response.json(functions.listarFilmes())
+    if(dadosFilmes) {
+        response.json(dadosFilmes)
+        response.status(200)
+
+    } else {
+        response.json({message: 'Nenhum registro encontrado'})
+        response.status(400)
+    }
 })
 
 //EndPoint: Retorna os dados do Banco de Dados

@@ -137,11 +137,10 @@ const selectAllFilmes = async function(){
    try {
         let sql = 'select * from tbl_filme'
         let resultFilmes = await prisma.$queryRawUnsafe(sql)
+        
+        if (resultFilmes.length > 0) {
             return resultFilmes
-
-            if (resultFilmes.length > 0) {
-                return resultFilmes
-            } else {
+        } else {
                 return false
             }
     } catch (error) {
