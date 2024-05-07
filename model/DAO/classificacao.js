@@ -1,67 +1,158 @@
-const bancoDeDados = require('./bancoDeDados');
+const {PrismaClient} = require('@prisma/client');
 
-const buscarTodasClassificacoes = async () => {
+// Instancia d classe PrismaClient
+const prisma = new PrismaClient();
+
+
+const selectAllDiretores = async function(){
     try {
-        return await db.$queryRawUnsafe('select * from classificacao');
-    } catch (error) {
-        console.error("Erro ao buscar todas as classificações:", error);
-        return false;
-    }
-};
+        let sql = 'select * from tbl_diretor order by id desc'
+        let resultDiretores = await prisma.$queryRawUnsafe(sql)
 
-const buscarClassificacaoPorId = async (id) => {
+            if(resultDiretores.length > 0 )
+                return resultDiretores
+    } catch(error) {
+        return false
+    }  
+}
+
+const deleteDiretores = async function (id) {
     try {
-        return await db.$queryRawUnsafe(`select * from classificacao where id = ${id}`);
-    } catch (error) {
-        console.error("Erro ao buscar classificação por ID:", error);
-        return false;
-    }
-};
+        let sql = `delete from tbl_diretor WHERE id = ${id}`
+        let resultDiretores = await prisma.$queryRawUnsafe(sql);
+            return resultDiretores
 
-const buscarUltimoIdClassificacao = async () => {
+    }catch (error) {
+        return false
+    }
+}
+
+const selectDiretoresById = async function(id){
     try {
-        return await db.$queryRawUnsafe('select cast(id as decimal) from classificacao order by id desc limit 1');
-    } catch (error) {
-        console.error("Erro ao buscar o ID da última classificação:", error);
-        return false;
-    }
-};
+        let sql = `select * from tbl_diretor where id = ${id}`;
+        let resultDiretores = await prisma.$queryRawUnsafe(sql);
+            return resultDiretores;
+   
+        } catch (error) {
+            return false;
+           
+        }
+}
 
-const inserirClassificacao = async ({ nome_classificacao, descricao_classificacao, sigla_classificacao }) => {
+const insertDiretores = async function (dadosDiretores){
     try {
-        const query = `insert intoclassificacao (nome_classificacao, descricao_classificacao, sigla_classificacao) values ('${nome_classificacao}', '${descricao_classificacao}', '${icone_sigla}')`;
-        return !!(await db.$executeRawUnsafe(query));
-    } catch (error) {
-        console.error("Erro ao inserir uma nova classificação:", error);
-        return false;
-    }
-};
+        let sql
+        if (dadosDiretores.data_falecimento == '' ||
+        dadosDiretores.data_falecimento == null ||
+        dadosDiretores.data_falecimento == undefined){
+           
+            sql = `insert into tbl_diretor (
+                nome,
+                data_nascimento,
+                biografia,
+                foto,
+                tbl_sexo_id
+            ) values (
+                '${dadosDiretores.nome}',
+                '${dadosDiretores.data_nascimento}',
+                '${dadosDiretores.biografia}',
+                '${dadosDiretores.foto}',
+                '${dadosDiretores.sexo[0].id}'
+            );`
+        } else {
+            sql = `insert into tbl_diretor (
+                nome,
+                data_nascimento,
+                data_falecimento,
+                biografia,
+                foto,
+                tbl_sexo_id
+            ) values (
+                '${dadosDiretores.nome}',
+                '${dadosDiretores.data_nascimento}',
+                '${dadosDiretores.data_falecimento}',
+                '${dadosDiretores.biografia}',
+                '${dadosDiretores.foto}',
+                '${dadosDiretores.sexo[0].id}'
+            )`
+        }
+        
+                let result = await prisma.$executeRawUnsafe(sql)
+        if (result)
+            return result
+        else
+            return false
 
-const deletarClassificacao = async (id) => {
+    } catch (error) {
+        return error
+    }
+}
+
+const updateDiretores = async function (id, dadosDiretores){
     try {
-        const query = `delete from classificacao where id = ${id}`;
-        return await db.$queryRawUnsafe(query);
-    } catch (error) {
-        console.error("Erro ao deletar classificação:", error);
-        return false;
-    }
-};
+       
+        let sql
 
-const atualizarClassificacao = async ({ id, nome_classificacao, descricao_classificacao, sigla_classificacao }) => {
+        if(dadosDiretores.data_falecimento!=''&&
+        dadosDiretores.data_falecimento!=null&&
+        dadosDiretores.data_falecimento!=undefined){
+
+            sql = `update tbl_diretor set
+
+            nome = '${dadosDiretores.nome}',
+            data_nascimento = '${dadosDiretores.data_nascimento}',
+            data_falecimento = '${dadosDiretores.data_falecimento}',
+            biografia = '${dadosDiretores.biografia}',
+            foto = '${dadosDiretores.foto}',
+            tbl_sexo_id = '${dadosDiretores.sexo[0].id}' where tbl_diretor.id = '${id}'
+            `
+        } else {
+
+            sql = `update tbl_diretor set
+                nome =  '${dadosDiretores.nome}',
+                data_nascimento = '${dadosDiretores.data_nascimento}',
+                data_falecimento =  null,
+                biografia =  '${dadosDiretores.biografia}',
+                foto = '${dadosDiretores.foto}',
+                tbl_sexo_id = '${dadosDiretores.sexo[0].id}' where tbl_diretor.id = '${id}'`
+        }
+       
+        let result = await prisma.$executeRawUnsafe(sql)
+        if (result)
+            return true
+        else
+            return false
+    } catch (error) {
+        return false
+    }
+}
+
+const selectByNomeDiretor = async function (nome) {
     try {
-        const query = `update classificacao set nome = '${nome_classificacao}', descricao = '${descricao_classificacao}', sigla_classificacao = '${sigla_classificacao}' where id = ${id}`;
-        return !!(await db.$executeRawUnsafe(query));
+        let sql = `select * from tbl_diretor where nome like "%${nome}%"`
+        let rsDiretores = await prisma.$queryRawUnsafe(sql)
+        return rsDiretores
     } catch (error) {
-        console.error("Erro ao atualizar classificação:", error);
-        return false;
+        return false
     }
-};
+}
 
-module.exports = {
-    buscarTodasClassificacoes,
-    buscarClassificacaoPorId,
-    buscarUltimoIdClassificacao,
-    inserirClassificacao,
-    deletarClassificacao,
-    atualizarClassificacao
-};
+const selectLastId = async function () {
+    try {
+        let sql ='select cast(last_insert_id() as decimal) as id from tbl_diretor limit 1;'
+        let rsLastID = await prisma.$queryRawUnsafe(sql)
+        return rsLastID
+    } catch (error) {
+        return false
+    }
+}
+
+module.exports ={
+    selectAllDiretores,
+    deleteDiretores,
+    selectDiretoresById,
+    insertDiretores,
+    updateDiretores,
+    selectByNomeDiretor,
+    selectLastId
+}
