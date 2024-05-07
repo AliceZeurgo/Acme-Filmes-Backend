@@ -1,5 +1,5 @@
 const { json } = require('body-parser')
-const usuariosDAO = require('../model/DAO/usuario')
+const usuariosDAO = require('../model/DAO/usuario.js')
 const message = require('../modulo/config')
 
 const getUsuarios = async function(){

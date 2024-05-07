@@ -8,11 +8,10 @@ const prisma = new PrismaClient()
 const buscarTodosUsuarios = async () => {
     try {
 
-        let sql 
-        sql = `SELECT * FROM tbl_usuario`
-        rsUsuarios = await prisma.$queryRawUnsafe(sql)
-
+        let sql = `SELECT * FROM tbl_usuario`
+        let rsUsuarios = await prisma.$queryRawUnsafe(sql)
         return rsUsuarios
+
     } catch (error) {
 
         return false
