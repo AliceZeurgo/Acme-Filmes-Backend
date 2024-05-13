@@ -1,31 +1,54 @@
 const {PrismaClient} = require('@prisma/client');
+const { setInserirNovoDiretor } = require('../../controller/controller_diretores');
 
 // Instancia d classe PrismaClient
 const prisma = new PrismaClient();
 
 
-const selectAllDiretores = async function(){
+const selectAllDiretores = async function () {
     try {
-        let sql = 'select * from tbl_diretor order by id desc'
-        let resultDiretores = await prisma.$queryRawUnsafe(sql)
-
-            if(resultDiretores.length > 0 )
-                return resultDiretores
-    } catch(error) {
-        return false
-    }  
-}
-
-const deleteDiretores = async function (id) {
-    try {
-        let sql = `delete from tbl_diretor WHERE id = ${id}`
+        let sql = 'SELECT * FROM diretores';
         let resultDiretores = await prisma.$queryRawUnsafe(sql);
-            return resultDiretores
 
-    }catch (error) {
-        return false
+        if (resultDiretores.length > 0) {
+            return resultDiretores;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error("Erro ao selecionar todos os diretores:", error);
+        return false;
     }
 }
+
+
+async function deleteDiretores(id) {
+    try {
+        let idDiretor = id;
+
+        if (idDiretor == '' || idDiretor == undefined || isNaN(idDiretor) || idDiretor == null) {
+            return message.ERROR_INVALID_ID; // erro 400
+        } else {
+            let diretor = await diretoresDAO.selectByIdDiretor(idDiretor);
+
+            if (diretor.length > 0) {
+                let diretorExcluido = await diretoresDAO.deleteDiretor(idDiretor);
+                
+                if (diretorExcluido) {
+                    return message.SUCCESS_DELETE_ITEM; // msg de sucesso 200
+                } else {
+                    return message.ERROR_INTERNAL_SERVER_DB; // erro 500
+                }
+            } else {
+                return message.ERROR_NOT_FOUND; // erro 404
+            }
+        }
+    } catch (error) {
+        console.error("Erro ao excluir diretor:", error);
+        return message.ERROR_INTERNAL_SERVER; // erro 500
+    }
+}
+
 
 const selectDiretoresById = async function(id){
     try {
@@ -39,120 +62,56 @@ const selectDiretoresById = async function(id){
         }
 }
 
-const insertDiretores = async function (dadosDiretores){
+const inserirDiretor = async function (dadosDiretor) {
     try {
-        let sql
-        if (dadosDiretores.data_falecimento == '' ||
-        dadosDiretores.data_falecimento == null ||
-        dadosDiretores.data_falecimento == undefined){
-           
-            sql = `insert into tbl_diretor (
-                nome,
-                data_nascimento,
-                biografia,
-                foto,
-                tbl_sexo_id
-            ) values (
-                '${dadosDiretores.nome}',
-                '${dadosDiretores.data_nascimento}',
-                '${dadosDiretores.biografia}',
-                '${dadosDiretores.foto}',
-                '${dadosDiretores.sexo[0].id}'
-            );`
+        let sql;
+        if (dadosDiretor.data_nascimento != '' &&
+            dadosDiretor.data_nascimento != null &&
+            dadosDiretor.data_nascimento != undefined
+        ) {
+            sql = `INSERT INTO diretores (nome_diretores, biografia, data_nascimento, foto_diretor)
+                   VALUES ('${dadosDiretor.nome_diretores}', 
+                           '${dadosDiretor.biografia}', 
+                           '${dadosDiretor.data_nascimento}', 
+                           '${dadosDiretor.foto_diretor}');`;
         } else {
-            sql = `insert into tbl_diretor (
-                nome,
-                data_nascimento,
-                data_falecimento,
-                biografia,
-                foto,
-                tbl_sexo_id
-            ) values (
-                '${dadosDiretores.nome}',
-                '${dadosDiretores.data_nascimento}',
-                '${dadosDiretores.data_falecimento}',
-                '${dadosDiretores.biografia}',
-                '${dadosDiretores.foto}',
-                '${dadosDiretores.sexo[0].id}'
-            )`
+            sql = `INSERT INTO diretores (nome_diretores, biografia, data_nascimento, foto_diretor)
+                   VALUES ('${dadosDiretor.nome_diretores}', 
+                           '${dadosDiretor.biografia}', 
+                           null, 
+                           '${dadosDiretor.foto_diretor}');`;
         }
-        
-                let result = await prisma.$executeRawUnsafe(sql)
+    
+        let result = await prisma.$executeRawUnsafe(sql);
         if (result)
-            return result
+            return true;
         else
-            return false
-
+            return false;
+    
     } catch (error) {
-        return error
+        console.error("Erro ao inserir diretor:", error);
+        return false;
     }
 }
 
-const updateDiretores = async function (id, dadosDiretores){
+const selectByIdDiretor = async function (id) {
     try {
-       
-        let sql
+        // SQL para pesquisa por ID
+        let sql = `SELECT * FROM diretores WHERE id = ${id}`;
 
-        if(dadosDiretores.data_falecimento!=''&&
-        dadosDiretores.data_falecimento!=null&&
-        dadosDiretores.data_falecimento!=undefined){
+        // Executa o SQL no BD e retorna o diretor
+        let resultDiretor = await prisma.$queryRawUnsafe(sql);
+        return resultDiretor;
 
-            sql = `update tbl_diretor set
-
-            nome = '${dadosDiretores.nome}',
-            data_nascimento = '${dadosDiretores.data_nascimento}',
-            data_falecimento = '${dadosDiretores.data_falecimento}',
-            biografia = '${dadosDiretores.biografia}',
-            foto = '${dadosDiretores.foto}',
-            tbl_sexo_id = '${dadosDiretores.sexo[0].id}' where tbl_diretor.id = '${id}'
-            `
-        } else {
-
-            sql = `update tbl_diretor set
-                nome =  '${dadosDiretores.nome}',
-                data_nascimento = '${dadosDiretores.data_nascimento}',
-                data_falecimento =  null,
-                biografia =  '${dadosDiretores.biografia}',
-                foto = '${dadosDiretores.foto}',
-                tbl_sexo_id = '${dadosDiretores.sexo[0].id}' where tbl_diretor.id = '${id}'`
-        }
-       
-        let result = await prisma.$executeRawUnsafe(sql)
-        if (result)
-            return true
-        else
-            return false
     } catch (error) {
-        return false
-    }
-}
-
-const selectByNomeDiretor = async function (nome) {
-    try {
-        let sql = `select * from tbl_diretor where nome like "%${nome}%"`
-        let rsDiretores = await prisma.$queryRawUnsafe(sql)
-        return rsDiretores
-    } catch (error) {
-        return false
-    }
-}
-
-const selectLastId = async function () {
-    try {
-        let sql ='select cast(last_insert_id() as decimal) as id from tbl_diretor limit 1;'
-        let rsLastID = await prisma.$queryRawUnsafe(sql)
-        return rsLastID
-    } catch (error) {
-        return false
+        console.error("Erro ao selecionar diretor por ID:", error);
+        return false;
     }
 }
 
 module.exports ={
     selectAllDiretores,
-    //deleteDiretores,
-    //selectDiretoresById,
-    //insertDiretores,
-    //updateDiretores,
-    //selectByNomeDiretor,
-    //selectLastId
+    deleteDiretores,
+    selectByIdDiretor,
+    setInserirNovoDiretor
 }

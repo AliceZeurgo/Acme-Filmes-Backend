@@ -103,6 +103,7 @@ const insertFilme = async function (dadosFilme) {
 //         };
 //     }
 // }
+
 const selectAllFilmes = async function () {
     try {
         let sql = 'select * from tbl_filmes'
