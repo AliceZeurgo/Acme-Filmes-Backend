@@ -21,14 +21,14 @@ const setInserirNovoFilme = async function (dadosFilme, contentType) {
         let novoFilmeJson = {};
     
         if (String(contentType).toLowerCase() === 'application/json') {
-            if (dadosFilme.nome === '' || dadosFilme.nome === undefined || dadosFilme.nome === null || dadosFilme.nome.length > 500 ||
-                dadosFilme.id_classificacao === undefined || dadosFilme.id_classificacao === null || isNaN(dadosFilme.id_classificacao) ||
-                dadosFilme.sinopse === '' || dadosFilme.sinopse === undefined || dadosFilme.sinopse === null || dadosFilme.sinopse.length > 65000 ||
-                dadosFilme.foto_capa === '' || dadosFilme.foto_capa === undefined || dadosFilme.foto_capa === null || dadosFilme.foto_capa.length > 3000 ||
-                dadosFilme.valor === undefined || dadosFilme.valor === null || isNaN(dadosFilme.valor) ||
-                dadosFilme.duracao === '' || dadosFilme.duracao === undefined || dadosFilme.duracao === null || dadosFilme.duracao.length > 8 ||
-                dadosFilme.data_lancamento === '' || dadosFilme.data_lancamento === undefined || dadosFilme.data_lancamento === null || dadosFilme.data_lancamento.length !== 10 ||
-                dadosFilme.data_relancamento === undefined || dadosFilme.data_relancamento === null || dadosFilme.data_relancamento.length !== 10) {
+            if (dadosFilme.nome === ''                    || dadosFilme.nome === undefined            || dadosFilme.nome === null            || dadosFilme.nome.length > 500 ||
+                dadosFilme.id_classificacao === undefined || dadosFilme.id_classificacao === null     || isNaN(dadosFilme.id_classificacao)  ||
+                dadosFilme.sinopse === ''                 || dadosFilme.sinopse === undefined         || dadosFilme.sinopse === null         || dadosFilme.sinopse.length > 65000 ||
+                dadosFilme.foto_capa === ''               || dadosFilme.foto_capa === undefined       || dadosFilme.foto_capa === null       || dadosFilme.foto_capa.length > 3000 ||
+                dadosFilme.valor === undefined            || dadosFilme.valor === null                || isNaN(dadosFilme.valor)             ||
+                dadosFilme.duracao === ''                 || dadosFilme.duracao === undefined         || dadosFilme.duracao === null         || dadosFilme.duracao.length > 8 ||
+                dadosFilme.data_lancamento === ''         || dadosFilme.data_lancamento === undefined || dadosFilme.data_lancamento === null || dadosFilme.data_lancamento.length !== 10 ||
+                dadosFilme.data_relancamento === undefined|| dadosFilme.data_relancamento === null    || dadosFilme.data_relancamento.length !== 10) {
                 return message.ERROR_REQUIRED_FIELDS;
             } else {
                 // Validação de um conteúdo válido

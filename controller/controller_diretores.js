@@ -99,7 +99,7 @@ async function getListarDiretores() {
 }
 
 // Função para deletar um diretor
-async function setExcluirDiretor(id) {
+async function setExcluirDiretores(id) {
     try {
         let idDiretor = id;
 
@@ -169,6 +169,6 @@ async function getBuscarDiretor(id) {
 module.exports = {
     setInserirNovoDiretor,
     getListarDiretores,
-    setExcluirDiretor,
+    setExcluirDiretores,
     getBuscarDiretor
  };

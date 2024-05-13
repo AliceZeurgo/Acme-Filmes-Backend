@@ -4,155 +4,72 @@ const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
 
-const selectAllDiretores = async function(){
+const inserirClassificacao = async function (dadosClassificacao) {
     try {
-        let sql = 'select * from tbl_diretor order by id desc'
-        let resultDiretores = await prisma.$queryRawUnsafe(sql)
+        let sql = `INSERT INTO classificacao (nome_classificacao, sigla_classificacao, descricao_classificacao)
+                   VALUES ('${dadosClassificacao.nome_classificacao}', 
+                           '${dadosClassificacao.sigla_classificacao}', 
+                           '${dadosClassificacao.descricao_classificacao}');`;
 
-            if(resultDiretores.length > 0 )
-                return resultDiretores
-    } catch(error) {
-        return false
-    }  
-}
-
-const deleteDiretores = async function (id) {
-    try {
-        let sql = `delete from tbl_diretor WHERE id = ${id}`
-        let resultDiretores = await prisma.$queryRawUnsafe(sql);
-            return resultDiretores
-
-    }catch (error) {
-        return false
-    }
-}
-
-const selectDiretoresById = async function(id){
-    try {
-        let sql = `select * from tbl_diretor where id = ${id}`;
-        let resultDiretores = await prisma.$queryRawUnsafe(sql);
-            return resultDiretores;
-   
-        } catch (error) {
+        let result = await prisma.$executeRawUnsafe(sql);
+        if (result)
+            return true;
+        else
             return false;
-           
-        }
+
+    } catch (error) {
+        console.error("Erro ao inserir classificação:", error);
+        return false;
+    }
 }
 
-const insertDiretores = async function (dadosDiretores){
+const deleteClassificacao = async function(id){
+
     try {
-        let sql
-        if (dadosDiretores.data_falecimento == '' ||
-        dadosDiretores.data_falecimento == null ||
-        dadosDiretores.data_falecimento == undefined){
-           
-            sql = `insert into tbl_diretor (
-                nome,
-                data_nascimento,
-                biografia,
-                foto,
-                tbl_sexo_id
-            ) values (
-                '${dadosDiretores.nome}',
-                '${dadosDiretores.data_nascimento}',
-                '${dadosDiretores.biografia}',
-                '${dadosDiretores.foto}',
-                '${dadosDiretores.sexo[0].id}'
-            );`
+        let sql = `DELETE FROM classificacao WHERE id = ${id}`;
+        let result = await prisma.$executeRawUnsafe(sql);
+
+        // Retorna true se a classificação foi deletada com sucesso, ou false caso contrário
+        return !!result;
+    } catch (error) {
+        console.error("Erro ao excluir classificação:", error);
+        return false;
+    }
+
+}
+
+const selectAllClassificacoes = async () => {
+    try {
+        let sql = 'SELECT * FROM classificacao';
+        let resultClassificacoes = await prisma.$queryRawUnsafe(sql);
+
+        if (resultClassificacoes.length > 0) {
+            return resultClassificacoes;
         } else {
-            sql = `insert into tbl_diretor (
-                nome,
-                data_nascimento,
-                data_falecimento,
-                biografia,
-                foto,
-                tbl_sexo_id
-            ) values (
-                '${dadosDiretores.nome}',
-                '${dadosDiretores.data_nascimento}',
-                '${dadosDiretores.data_falecimento}',
-                '${dadosDiretores.biografia}',
-                '${dadosDiretores.foto}',
-                '${dadosDiretores.sexo[0].id}'
-            )`
-        }
-        
-                let result = await prisma.$executeRawUnsafe(sql)
-        if (result)
-            return result
-        else
-            return false
-
-    } catch (error) {
-        return error
+            return false;
+        }} catch (error) {
+        console.error("Erro ao selecionar todas as classificações:", error);
+        return false;
     }
-}
+};
 
-const updateDiretores = async function (id, dadosDiretores){
+const selectClassificacaoById = async (id) => {
     try {
-       
-        let sql
+        // SQL para pesquisa por ID
+        let sql = `SELECT * FROM classificacao WHERE id = ${id}`;
 
-        if(dadosDiretores.data_falecimento!=''&&
-        dadosDiretores.data_falecimento!=null&&
-        dadosDiretores.data_falecimento!=undefined){
-
-            sql = `update tbl_diretor set
-
-            nome = '${dadosDiretores.nome}',
-            data_nascimento = '${dadosDiretores.data_nascimento}',
-            data_falecimento = '${dadosDiretores.data_falecimento}',
-            biografia = '${dadosDiretores.biografia}',
-            foto = '${dadosDiretores.foto}',
-            tbl_sexo_id = '${dadosDiretores.sexo[0].id}' where tbl_diretor.id = '${id}'
-            `
-        } else {
-
-            sql = `update tbl_diretor set
-                nome =  '${dadosDiretores.nome}',
-                data_nascimento = '${dadosDiretores.data_nascimento}',
-                data_falecimento =  null,
-                biografia =  '${dadosDiretores.biografia}',
-                foto = '${dadosDiretores.foto}',
-                tbl_sexo_id = '${dadosDiretores.sexo[0].id}' where tbl_diretor.id = '${id}'`
-        }
-       
-        let result = await prisma.$executeRawUnsafe(sql)
-        if (result)
-            return true
-        else
-            return false
+        // Executa o SQL no BD e retorna a classificação
+        let resultClassificacao = await prisma.$queryRawUnsafe(sql);
+        return resultClassificacao;
     } catch (error) {
-        return false
+        console.error("Erro ao selecionar classificação por ID:", error);
+        return false;
     }
-}
-
-const selectByNomeDiretor = async function (nome) {
-    try {
-        let sql = `select * from tbl_diretor where nome like "%${nome}%"`
-        let rsDiretores = await prisma.$queryRawUnsafe(sql)
-        return rsDiretores
-    } catch (error) {
-        return false
-    }
-}
-
-const selectLastId = async function () {
-    try {
-        let sql ='select cast(last_insert_id() as decimal) as id from tbl_diretor limit 1;'
-        let rsLastID = await prisma.$queryRawUnsafe(sql)
-        return rsLastID
-    } catch (error) {
-        return false
-    }
-}
+};
 
 module.exports ={
-    selectAllDiretores,
-    deleteDiretores,
-    selectDiretoresById,
-    insertDiretores,
-    updateDiretores,
-    selectByNomeDiretor,
-    selectLastId
+    selectAllClassificacoes,
+    deleteClassificacao,
+    selectClassificacaoById,
+    inserirClassificacao,
 }

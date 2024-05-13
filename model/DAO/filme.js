@@ -9,34 +9,31 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const insertFilme = async function (dadosFilme) {
-    
     try {
         let sql;
         if (dadosFilme.data_relancamento != '' &&
             dadosFilme.data_relancamento != null &&
             dadosFilme.data_relancamento != undefined
         ) {
-            sql = `UPDATE tbl_filmes SET 
-                        nome = '${dadosFilme.nome}',
-                        sinopse = '${dadosFilme.sinopse}',
-                        duracao = '${dadosFilme.duracao}',
-                        data_lancamento = '${dadosFilme.data_lancamento}',
-                        data_relancamento = '${dadosFilme.data_relancamento}',
-                        foto_capa = '${dadosFilme.foto_capa}',
-                        valor = ${dadosFilme.valor},
-                        id_classificacao = ${dadosFilme.id_classificacao}
-                        WHERE id = ${id};`;
+            sql = `INSERT INTO tbl_filmes (nome, sinopse, duracao, data_lancamento, data_relancamento, foto_capa, valor, id_classificacao)
+                   VALUES ('${dadosFilme.nome}', 
+                           '${dadosFilme.sinopse}', 
+                           '${dadosFilme.duracao}', 
+                           '${dadosFilme.data_lancamento}', 
+                           '${dadosFilme.data_relancamento}', 
+                           '${dadosFilme.foto_capa}', 
+                           ${dadosFilme.valor}, 
+                           ${dadosFilme.id_classificacao});`;
         } else {
-            sql = `UPDATE tbl_filmes SET 
-                        nome = '${dadosFilme.nome}',
-                        sinopse = '${dadosFilme.sinopse}',
-                        duracao = '${dadosFilme.duracao}',
-                        data_lancamento = '${dadosFilme.data_lancamento}',
-                        data_relancamento = null,
-                        foto_capa = '${dadosFilme.foto_capa}',
-                        valor = ${dadosFilme.valor},
-                        id_classificacao = ${dadosFilme.id_classificacao}
-                        WHERE id = ${id};`;
+            sql = `INSERT INTO tbl_filmes (nome, sinopse, duracao, data_lancamento, data_relancamento, foto_capa, valor, id_classificacao)
+                   VALUES ('${dadosFilme.nome}', 
+                           '${dadosFilme.sinopse}', 
+                           '${dadosFilme.duracao}', 
+                           '${dadosFilme.data_lancamento}', 
+                           null, 
+                           '${dadosFilme.foto_capa}', 
+                           ${dadosFilme.valor}, 
+                           ${dadosFilme.id_classificacao});`;
         }
     
         let result = await prisma.$executeRawUnsafe(sql);
@@ -46,63 +43,10 @@ const insertFilme = async function (dadosFilme) {
             return false;
     
     } catch (error) {
-        console.error("Erro ao atualizar filme:", error);
+        console.error("Erro ao inserir filme:", error);
         return false;
     }
-    
-    
-}    
-
-// const updateFilme = async function (id, dadosFilme) {
-//     try {
-//         let sql;
-//         if (dadosFilme.data_relancamento) {
-//             sql = `UPDATE tbl_filmes SET 
-//                     nome = '${dadosFilme.nome}',
-//                     sinopse = '${dadosFilme.sinopse}',
-//                     duracao = '${dadosFilme.duracao}',
-//                     data_lancamento = '${dadosFilme.data_lancamento}',
-//                     data_relancamento = '${dadosFilme.data_relancamento}',
-//                     foto_capa = '${dadosFilme.foto_capa}',
-//                     valor = '${dadosFilme.valor}',
-//                     id_classificacao = '${dadosFilme.id_classificacao}'
-//                     WHERE id = ${id};`;
-//         } else {
-//             sql = `UPDATE tbl_filmes SET 
-//                     nome = '${dadosFilme.nome}',
-//                     sinopse = '${dadosFilme.sinopse}',
-//                     duracao = '${dadosFilme.duracao}',
-//                     data_lancamento = '${dadosFilme.data_lancamento}',
-//                     data_relancamento = null,
-//                     foto_capa = '${dadosFilme.foto_capa}',
-//                     valor = '${dadosFilme.valor}',
-//                     id_classificacao = '${dadosFilme.id_classificacao}'
-//                     WHERE id = ${id};`;
-//         }
-    
-//         let result = await prisma.$executeRawUnsafe(sql);
-//         if (result) {
-//             return {
-//                 "status": true,
-//                 "status_code": 200,
-//                 "message": "Filme atualizado com sucesso"
-//             };
-//         } else {
-//             return {
-//                 "status": false,
-//                 "status_code": 500,
-//                 "message": "Erro interno do servidor ao atualizar o filme"
-//             };
-//         }
-//     } catch (error) {
-//         console.error("Erro ao atualizar filme:", error);
-//         return {
-//             "status": false,
-//             "status_code": 500,
-//             "message": "Ocorreu um erro interno do servidor"
-//         };
-//     }
-// }
+ }
 
 const selectAllFilmes = async function () {
     try {
@@ -119,7 +63,6 @@ const selectAllFilmes = async function () {
     }
 
 }
-
 
 const selectByIdFilme = async function (id) {
     try {
@@ -153,7 +96,6 @@ const deleteFilme = async function(id){
 
 module.exports = {
     insertFilme,
-    // updateFilme,
     selectAllFilmes,
     selectByIdFilme,
     deleteFilme
