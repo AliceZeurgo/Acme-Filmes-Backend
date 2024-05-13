@@ -149,10 +149,10 @@ const selectLastId = async function () {
 
 module.exports ={
     selectAllDiretores,
-    deleteDiretores,
-    selectDiretoresById,
-    insertDiretores,
-    updateDiretores,
-    selectByNomeDiretor,
-    selectLastId
+    //deleteDiretores,
+    //selectDiretoresById,
+    //insertDiretores,
+    //updateDiretores,
+    //selectByNomeDiretor,
+    //selectLastId
 }
