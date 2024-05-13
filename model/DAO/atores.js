@@ -1,153 +1,100 @@
-const {PrismaClient} = require('@prisma/client')
-const prisma = new PrismaClient()
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+const message = require('../../modulo/config.js');
 
-const selectAllAtores = async function(){
+const inserirNovoAtor = async function (dadosAtor) {
     try {
-        let sql = 'select * from tbl_ator order by id desc';
-        let resultAtores = await prisma.$queryRawUnsafe(sql)
-
-    if(resultAtores.length > 0 )
-    return resultAtores
-    } catch (error) {
-        return false
-    }
-}
-
-const deleteAtores = async function (id) {
-    try {
-        let sql = `delete from tbl_ator WHERE id = ${id}`
-        let resultAtores = await prisma.$queryRawUnsafe(sql);
-            return resultAtores
-
-    } catch (error) {
-        return false
-    }
-}
-
-const selectAtoresById = async function(id){
-    try {
-        let sql = `select * from tbl_ator where id = ${id}`
-        let resultAtores = await prisma.$queryRawUnsafe(sql)
-            return resultAtores;
-   
-        } catch (error) {
-            return false;
-           
-        }
-}
-
-const insertAtores = async function (dadosAtores){
-    try {
-       
-        let sql
-
-        if (dadosAtores.data_falecimento != '' &&
-        dadosAtores.data_falecimento != null &&
-        dadosAtores.data_falecimento != undefined){
-           
-            sql = `insert into tbl_ator (
-                nome,
-                data_nascimento,
-                data_falecimento,
-                biografia,
-                foto,
-                tbl_sexo_id
-            ) values (
-                '${dadosAtores.nome}',
-                '${dadosAtores.data_nascimento}',
-                '${dadosAtores.data_falecimento}',
-                '${dadosAtores.biografia}',
-                '${dadosAtores.foto}',
-                '${dadosAtores.sexo[0].id}'
-            )`
-
-            let result = await prisma.$executeRawUnsafe(sql)
-            if (result)
-            return true
-            else
-            return false
-
+        let sql;
+        if (dadosAtor.data_nascimento != '' &&
+            dadosAtor.data_nascimento != null &&
+            dadosAtor.data_nascimento != undefined
+        ) {
+            sql = `INSERT INTO atores (nome, biografia, data_nascimento, foto_ator)
+                   VALUES ('${dadosAtor.nome}', 
+                           '${dadosAtor.biografia}', 
+                           '${dadosAtor.data_nascimento}', 
+                           '${dadosAtor.foto_ator}');`;
         } else {
-            sql = `insert into tbl_ator (
-                nome,
-                data_nascimento,
-                data_falecimento,
-                biografia,
-                foto,
-                tbl_sexo_id
-            ) values (
-                '${dadosAtores.nome}',
-                '${dadosAtores.data_nascimento}',
-                null,
-                '${dadosAtores.biografia}',
-                '${dadosAtores.foto}',
-                '${dadosAtores.sexo[0].id}'
-            )`
-           
-
-            let result = await prisma.$executeRawUnsafe(sql)
-            if (result)
-            return true
-            else
-            return false
+            sql = `INSERT INTO atores (nome, biografia, data_nascimento, foto_ator)
+                   VALUES ('${dadosAtor.nome}', 
+                           '${dadosAtor.biografia}', 
+                           null, 
+                           '${dadosAtor.foto_ator}');`;
         }
-
-    } catch (error) {
-        return false
-    }
-}
-
-const updateAtores = async function (id, dadosAtores){
-    try {    
-        let sql
-
-        if(dadosAtores.data_falecimento!=''&&
-        dadosAtores.data_falecimento!=null&&
-        dadosAtores.data_falecimento!=undefined){
-
-            sql = `update tbl_ator set
-
-            nome = '${dadosAtores.nome}',
-            data_nascimento = '${dadosAtores.data_nascimento}',
-            biografia = '${dadosAtores.biografia}',
-            tbl_sexo_id = '${dadosAtores.sexo[0].id}' where tbl_ator.id = '${id}'
-            `
-        } else {
-
-            sql = `update tbl_ator set
-                nome =  '${dadosAtores.nome}',
-                data_nascimento = '${dadosAtores.data_nascimento}',
-                data_falecimento =  null,
-                biografia =  '${dadosAtores.biografia}',
-                foto = '${dadosAtores.foto}',
-                tbl_sexo_id = '${dadosAtores.sexo[0].id}' where tbl_ator.id = '${id}'`
-        }
-       
-        let result = await prisma.$executeRawUnsafe(sql)
+    
+        let result = await prisma.$executeRawUnsafe(sql);
         if (result)
-            return true
+            return true;
         else
-            return false
+            return false;
+    
     } catch (error) {
-        return false
+        console.error("Erro ao inserir ator:", error);
+        return false;
     }
 }
 
-const selectByNomeAtor = async function (nome) {
+const listarAtores = async function () {
     try {
-        let sql = `select * from tbl_ator where nome like "%${nome}%"`
-        let resultAtores = await prisma.$queryRawUnsafe(sql)
-            return resultAtores
+        let sql = 'SELECT * FROM atores';
+        let resultAtores = await prisma.$queryRawUnsafe(sql);
+
+        if (resultAtores.length > 0) {
+            return resultAtores;
+        } else {
+            return false;
+        }
     } catch (error) {
-        return false
+        console.error("Erro ao selecionar todos os atores:", error);
+        return false;
     }
 }
 
-module.exports = {
-    selectAllAtores,
-    deleteAtores,
-    selectAtoresById,
-    insertAtores,
-    updateAtores,
-    selectByNomeAtor
+const excluirAtor = async function (id) {
+    try {
+        let idAtor = id;
+
+        if (idAtor == '' || idAtor == undefined || isNaN(idAtor) || idAtor == null) {
+            return message.ERROR_INVALID_ID; // erro 400
+        } else {
+            let ator = await selectByIdAtor(idAtor);
+
+            if (ator.length > 0) {
+                let atorExcluido = await deleteAtor(idAtor);
+                
+                if (atorExcluido) {
+                    return message.SUCCESS_DELETE_ITEM; // msg de sucesso 200
+                } else {
+                    return message.ERROR_INTERNAL_SERVER_DB; // erro 500
+                }
+            } else {
+                return message.ERROR_NOT_FOUND; // erro 404
+            }
+        }
+    } catch (error) {
+        console.error("Erro ao excluir ator:", error);
+        return message.ERROR_INTERNAL_SERVER; // erro 500
+    }
+}
+
+const selectByIdAtor = async function (id) {
+    try {
+        // SQL para pesquisa por ID
+        let sql = `SELECT * FROM atores WHERE id = ${id}`;
+
+        // Executa o SQL no BD e retorna o ator
+        let resultAtor = await prisma.$queryRawUnsafe(sql);
+        return resultAtor;
+
+    } catch (error) {
+        console.error("Erro ao selecionar ator por ID:", error);
+        return false;
+    }
+}
+
+module.exports ={
+    inserirNovoAtor,
+    listarAtores,
+    excluirAtor,
+    selectByIdAtor
 }
