@@ -125,9 +125,9 @@ async function getListarFilmes() {
     }
 }
 
+
 // Função para buscar filme pelo ID
 async function getBuscarFilme(id) {
-    console.log("ID do filme recebido na função:", id);
     //recebe o id pelo app
     let idFilme = id
     idFilme = parseInt(idFilme)

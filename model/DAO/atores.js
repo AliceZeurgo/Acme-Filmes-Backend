@@ -2,8 +2,20 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const message = require('../../modulo/config.js');
 
-const inserirNovoAtor = async function (dadosAtor) {
+
+async function inserirNovoAtor(dadosAtor) {
     try {
+
+        if (!dadosAtor || Object.keys(dadosAtor).length === 0) {
+            console.error("Erro ao inserir ator: Dados do ator são inválidos");
+            return false;
+        }
+
+        if (!dadosAtor.nome || !dadosAtor.biografia || !dadosAtor.foto_ator || !dadosAtor.data_nascimento) {
+            console.error("Erro ao inserir ator: Dados do ator estão incompletos");
+            return false;
+        }
+
         let sql;
         if (dadosAtor.data_nascimento != '' &&
             dadosAtor.data_nascimento != null &&
@@ -34,6 +46,7 @@ const inserirNovoAtor = async function (dadosAtor) {
     }
 }
 
+
 const listarAtores = async function () {
     try {
         let sql = 'SELECT * FROM atores';
@@ -51,31 +64,18 @@ const listarAtores = async function () {
 }
 
 const excluirAtor = async function (id) {
+
     try {
-        let idAtor = id;
 
-        if (idAtor == '' || idAtor == undefined || isNaN(idAtor) || idAtor == null) {
-            return message.ERROR_INVALID_ID; // erro 400
-        } else {
-            let ator = await selectByIdAtor(idAtor);
+        let sql = `DELETE FROM atores WHERE id = ${id}`
 
-            if (ator.length > 0) {
-                let atorExcluido = await deleteAtor(idAtor);
-                
-                if (atorExcluido) {
-                    return message.SUCCESS_DELETE_ITEM; // msg de sucesso 200
-                } else {
-                    return message.ERROR_INTERNAL_SERVER_DB; // erro 500
-                }
-            } else {
-                return message.ERROR_NOT_FOUND; // erro 404
-            }
-        }
-    } catch (error) {
-        console.error("Erro ao excluir ator:", error);
-        return message.ERROR_INTERNAL_SERVER; // erro 500
-    }
-}
+        let rdAtor = await prisma.$executeRawUnsafe(sql)
+        
+        return rdAtor
+    } catch (error){
+        return false
+    }}
+
 
 const selectByIdAtor = async function (id) {
     try {
@@ -92,7 +92,7 @@ const selectByIdAtor = async function (id) {
     }
 }
 
-module.exports ={
+module.exports = {
     inserirNovoAtor,
     listarAtores,
     excluirAtor,

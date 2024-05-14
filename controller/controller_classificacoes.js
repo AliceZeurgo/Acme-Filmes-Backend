@@ -54,7 +54,7 @@ async function setExcluirClassificacao(id) {
         if (idClassificacao == '' || idClassificacao == undefined || isNaN(idClassificacao) || idClassificacao == null) {
             return message.ERROR_INVALID_ID;
         } else {
-            let classificacao = await classificacaoDAO.selectByIdClassificacao(idClassificacao);
+            let classificacao = await classificacaoDAO.selectClassificacaoById(idClassificacao);
 
             if (classificacao.length > 0) {
                 let classificacaoExcluida = await classificacaoDAO.deleteClassificacao(idClassificacao);
@@ -76,22 +76,19 @@ async function setExcluirClassificacao(id) {
 
 const getListarClassificacoes = async () => {
     try {
-        // Cria uma variável do tipo JSON
         let classificacoesJSON = {};
 
-        // Chama a função do DAO para buscar os dados no BD
-        let dadosClassificacoes = await classificacoesDAO.selectAllClassificacoes();
+        let dadosClassificacoes = await classificacaoDAO.selectAllClassificacoes();
 
-        // Verifica se existem dados retornados do DAO
         if (dadosClassificacoes) {
-            // Montando o JSON para retornar para o APP
+           
             classificacoesJSON.classificacoes = dadosClassificacoes;
             classificacoesJSON.quantidade = dadosClassificacoes.length;
             classificacoesJSON.status_code = 200;
-            // Retorna o JSON montado
+           
             return classificacoesJSON;
         } else {
-            // Retorna false quando não houverem dados
+            
             return false;
         }
     } catch (error) {
@@ -100,34 +97,35 @@ const getListarClassificacoes = async () => {
     }
 };
 
-const getBuscarFilme = async (id) => {
-    console.log("ID do filme recebido na função:", id);
+const getBuscarIdClass = async (id) => {
 
-    try {
-        let idFilme = parseInt(id);
+   //recebe o id pelo app
+   let idClassificacao = id
+   idClassificacao = parseInt(idClassificacao)
+   let classificacoesJSON = {}
 
-        if (isNaN(idFilme)) {
-            return message.ERROR_INVALID_ID;
-        } else {
-            let filmeJson = {};
-            let dadosFilmes = await filmesDAO.selectByIdFilme(idFilme);
+   if (idClassificacao == '' || idClassificacao == undefined || isNaN(idClassificacao)) {
+       return message.ERROR_INVALID_ID;
+   } else {
 
-            if (dadosFilmes) {
-                if (dadosFilmes.length > 0) {
-                    filmeJson.filme = dadosFilmes;
-                    filmeJson.status_code = 200;
-                    return filmeJson;
-                } else {
-                    return message.ERROR_NOT_FOUND;
-                }
-            } else {
-                return message.ERROR_INTERNAL_SERVER;
-            }
-        }
-    } catch (error) {
-        console.error("Erro ao buscar filme:", error);
-        return message.ERROR_INTERNAL_SERVER;
-    }
+       let dadosClassificacao = await classificacaoDAO.selectClassificacaoById(idClassificacao);
+
+       if (dadosClassificacao) {
+
+           if (dadosClassificacao && dadosClassificacao.length > 0) {
+               classificacoesJSON.classificacao = dadosClassificacao;
+               classificacoesJSON.status_code = 200;
+
+               return classificacoesJSON;
+
+           } else {
+               return message.ERROR_NOT_FOUND;
+           }
+           //monsta o json com o retorno dos dados
+       } else {
+           return message.ERROR_INTERNAL_SERVER;
+       }
+   }
 };
 
 
@@ -136,5 +134,5 @@ module.exports = {
     setInserirNovaClassificacao,
     setExcluirClassificacao,
     getListarClassificacoes,
-    getBuscarFilme
+    getBuscarIdClass
 };

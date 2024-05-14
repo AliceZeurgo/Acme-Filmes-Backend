@@ -7,13 +7,11 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Import do arquivo de configurações do projeto
 const message = require('../modulo/config.js')
 
-// Import do arquivo DAO para manipular dados do BD
+
 const usuariosDAO = require('../model/DAO/usuario.js')
 
-// Função para inserir um novo usuário no Banco de dados
 const setInserirNovoUsuario = async function (dadosUsuario, contentType) {
 
     try {
@@ -26,7 +24,7 @@ const setInserirNovoUsuario = async function (dadosUsuario, contentType) {
                 dadosUsuario.email === ''                || dadosUsuario.email === undefined         || dadosUsuario.email === null         || dadosUsuario.email.length > 40         ||
                 dadosUsuario.img_usuario === undefined   || dadosUsuario.img_usuario.length > 400    ||
                 dadosUsuario.administrador === undefined || typeof dadosUsuario.administrador !== 'boolean') {
-                return message.ERROR_REQUIRED_FIELDS;
+                return message.ERROR_REQUIRED_FIELDS; // 400
             } else {
                 statusValidated = true;
             }
@@ -58,7 +56,7 @@ async function getListarUsuarios() {
 
     let usuariosJSON = {};
 
-    let dadosUsuarios = await usuarioDAO.selectAllUsuarios();
+    let dadosUsuarios = await usuariosDAO.selectAllUsuarios();
 
     // Verifica se existem dados retornados do DAO
     if (dadosUsuarios) {

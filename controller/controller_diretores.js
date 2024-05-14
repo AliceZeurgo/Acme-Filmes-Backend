@@ -12,26 +12,27 @@ const message = require('../modulo/config.js')
 
 // Import do arquivo DAO para manipular dados do BD
 const diretoresDAO = require('../model/DAO/diretores.js');
-const { setExcluirDiretor } = require('./controller_diretores.js');
+const { setExcluirDiretores } = require('./controller_diretores.js');
+
 
 // Função para inserir um novo diretor no Banco de dados
 const setInserirNovoDiretor = async function (dadosDiretores, contentType) {
-
     try {
         let statusValidated = false;
         let novoDiretorJson = {};
 
+        // Verifica o tipo de conteúdo
         if (String(contentType).toLowerCase() === 'application/json') {
-            if (!dadosDiretores.nome_diretores  || dadosDiretores.nome_diretores.length > 30 ||
-                !dadosDiretores.biografia       || dadosDiretores.biografia.length > 400     ||
-                !dadosDiretores.foto_diretor    || dadosDiretores.foto_diretor.length > 300  ||
+            // Validação dos campos
+            if (!dadosDiretores.nome_diretores || dadosDiretores.nome_diretores.length > 255 ||
+                !dadosDiretores.biografia || dadosDiretores.biografia.length > 400 ||
+                !dadosDiretores.foto_diretor || dadosDiretores.foto_diretor.length > 300 ||
                 !dadosDiretores.data_nascimento || dadosDiretores.data_nascimento.length !== 10) {
                 return message.ERROR_REQUIRED_FIELDS;
             } else {
                 statusValidated = true;
             }
         } else {
-            // Validação de conteúdo válido
             if (dadosDiretores.data_nascimento !== '' &&
                 dadosDiretores.data_nascimento !== null &&
                 dadosDiretores.data_nascimento !== undefined) {
@@ -45,20 +46,19 @@ const setInserirNovoDiretor = async function (dadosDiretores, contentType) {
                 statusValidated = true;
             }
 
-            // Se a variável for verdadeira, encaminha os dados para o DAO
             if (statusValidated === true) {
                 // Encaminha os dados para o DAO
-                let novoDiretor = await diretoresDAO.inserirDiretor(dadosDiretores);
+                let novoDiretor = await diretoresDAO.setInserirNovoDiretorDAO(dadosDiretores);
 
+                // Verifica se o novo diretor foi inserido com sucesso
                 if (novoDiretor) {
-                    // Cria um JSON e retorna informações com a requisição e os dados novos
                     novoDiretorJson.status = message.SUCCESS_CREATED_ITEM.status;
                     novoDiretorJson.status_code = message.SUCCESS_CREATED_ITEM.status_code;
                     novoDiretorJson.message = message.SUCCESS_CREATED_ITEM.message;
                     novoDiretorJson.diretor = dadosDiretores;
                     novoDiretorJson.id = novoDiretor.id;
 
-                    return novoDiretorJson; 
+                    return novoDiretorJson;
                 } else {
                     return message.ERROR_INTERNAL_SERVER_DB; // Erro 500
                 }
@@ -67,27 +67,19 @@ const setInserirNovoDiretor = async function (dadosDiretores, contentType) {
     } catch (error) {
         return message.ERROR_INTERNAL_SERVER;
     }
-
 }
 
 
 // Função para retornar todos os diretores do banco de dados
 async function getListarDiretores() {
     try {
-        // Cria uma variável do tipo JSON
-        let diretoresJSON = {};
-
         // Chama a função do DAO para buscar os dados no BD
         let dadosDiretores = await diretoresDAO.selectAllDiretores();
 
         // Verifica se existem dados retornados do DAO
         if (dadosDiretores) {
-            // Montando o JSON para retornar para o APP
-            diretoresJSON.diretores = dadosDiretores;
-            diretoresJSON.quantidade = dadosDiretores.length;
-            diretoresJSON.status_code = 200;
-            // Retorna o JSON montado
-            return diretoresJSON;
+            // Retorna a lista de diretores diretamente
+            return dadosDiretores;
         } else {
             // Retorna false quando não houverem dados
             return false;
@@ -98,22 +90,21 @@ async function getListarDiretores() {
     }
 }
 
-// Função para deletar um diretor
-async function setExcluirDiretores(id) {
+async function setExcluirDiretor(id) {
     try {
-        let idDiretor = id;
+        let iddiretor = id;
 
-        // Validação para verificar se o ID é válido (vazio, indefinido ou não numérico)
-        if (idDiretor == '' || idDiretor == undefined || isNaN(idDiretor) || idDiretor == null) {
+        if (iddiretor == '' || iddiretor == undefined || isNaN(iddiretor) || iddiretor == null) {
             return message.ERROR_INVALID_ID; // 400
         } else {
-            let diretor = await diretoresDAO.selectByIdDiretor(idDiretor);
+            let diretor = await diretoresDAO.selectByIdDiretor(iddiretor);
 
             if (diretor.length > 0) {
-                let diretorExcluido = await diretoresDAO.deleteDiretor(idDiretor);
+
+                let diretorExcluido = await diretoresDAO.deleteDiretores(iddiretor);
 
                 if (diretorExcluido) {
-                    return message.SUCCESS_DELETE_ITEM; // 200
+                    return message.SUCESS_DELETE_ITEM; // 200
                 } else {
                     return message.ERROR_INTERNAL_SERVER_DB; // 500
                 }
@@ -126,6 +117,8 @@ async function setExcluirDiretores(id) {
         return message.ERROR_INTERNAL_SERVER; // 500
     }
 }
+
+
 
 // Função para pesquisar diretor por id
 async function getBuscarDiretor(id) {
@@ -169,6 +162,6 @@ async function getBuscarDiretor(id) {
 module.exports = {
     setInserirNovoDiretor,
     getListarDiretores,
-    setExcluirDiretores,
+    setExcluirDiretor,
     getBuscarDiretor
  };

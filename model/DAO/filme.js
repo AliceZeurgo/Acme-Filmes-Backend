@@ -15,7 +15,7 @@ const insertFilme = async function (dadosFilme) {
             dadosFilme.data_relancamento != null &&
             dadosFilme.data_relancamento != undefined
         ) {
-            sql = `INSERT INTO tbl_filmes (nome, sinopse, duracao, data_lancamento, data_relancamento, foto_capa, valor, id_classificacao)
+            sql = `INSERT INTO filmes (nome, sinopse, duracao, data_lancamento, data_relancamento, foto_capa, valor, id_classificacao)
                    VALUES ('${dadosFilme.nome}', 
                            '${dadosFilme.sinopse}', 
                            '${dadosFilme.duracao}', 
@@ -25,7 +25,7 @@ const insertFilme = async function (dadosFilme) {
                            ${dadosFilme.valor}, 
                            ${dadosFilme.id_classificacao});`;
         } else {
-            sql = `INSERT INTO tbl_filmes (nome, sinopse, duracao, data_lancamento, data_relancamento, foto_capa, valor, id_classificacao)
+            sql = `INSERT INTO filmes (nome, sinopse, duracao, data_lancamento, data_relancamento, foto_capa, valor, id_classificacao)
                    VALUES ('${dadosFilme.nome}', 
                            '${dadosFilme.sinopse}', 
                            '${dadosFilme.duracao}', 
@@ -50,7 +50,7 @@ const insertFilme = async function (dadosFilme) {
 
 const selectAllFilmes = async function () {
     try {
-        let sql = 'select * from tbl_filmes'
+        let sql = 'select * from filmes'
         let resultFilmes = await prisma.$queryRawUnsafe(sql)
 
         if (resultFilmes.length > 0) {
@@ -67,7 +67,7 @@ const selectAllFilmes = async function () {
 const selectByIdFilme = async function (id) {
     try {
         //sql pra pesquisa por id
-        let sql = `select * from tbl_filmes where id = ${id}`
+        let sql = `select * from filmes where id = ${id}`
 
         //executa o sql no bd e retorna o filme
         let resultFilme = await prisma.$queryRawUnsafe(sql)
@@ -81,7 +81,7 @@ const selectByIdFilme = async function (id) {
 const deleteFilme = async function(id){
 
     try {
-        let sql = `DELETE FROM tbl_filmes WHERE id = ${id}`; // Correção no nome da tabela
+        let sql = `DELETE FROM filmes WHERE id = ${id}`; // Correção no nome da tabela
         let result = await prisma.$executeRawUnsafe(sql);
 
         // Retorna true se o filme foi deletado com sucesso, ou false caso contrário

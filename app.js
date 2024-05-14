@@ -21,7 +21,7 @@
 
 const express = require('express')
 const cors = require('cors')
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 const app = express()
 
@@ -42,10 +42,10 @@ const bodyParserJSON = bodyParser.json();
 /******************************** Imports de arquivos e bibliotecas do Projeto *********************************/
 
 const controllerFilmes = require('./controller/controller_filme.js')
-const controllerDiretores = require('./controller/controller_diretores.js')
 const controllerAtores = require('./controller/controller_atores.js')
 const controllerClassificacoes = require('./controller/controller_classificacoes.js')
 const controllerUsuarios = require('./controller/controller_usuarios.js')
+const controllerDiretores = require('./controller/controller_diretores.js')
 const message  = require('./modulo/config.js')
 
 
@@ -58,11 +58,11 @@ const message  = require('./modulo/config.js')
 
 //--------------------- FILMES -------------------------//
 
-app.get('/AcmeFilmes/filmes', async(request, response, next) => {
-    let dadosFilmes = await controllerFilmes.getListarFilmes()
+app.get('/v2/AcmeFilmes/filmes', async(request, response, next) => {
+    let dadosClassificacoess = await controllerFilmes.getListarFilmes()
 
-    if(dadosFilmes) {
-        response.json(dadosFilmes)
+    if(dadosClassificacoess) {
+        response.json(dadosClassificacoess)
         response.status(200)
 
     } else {
@@ -137,20 +137,19 @@ app.get('/AcmeFilmes/usuarios', async (request, response, next) => {
 app.get('/v2/acmefilmes/filme/:id', cors(), async function(request, response, next){
     //Recebe o id encaminhado pela requisição 
     let idFilme = request.params.id
-    console.log("ID do filme recebido:", idFilme);
-    let dadosFilme = await controllerFilmes.getBuscarFilme(idFilme)
+    let dadosClassificacoes = await controllerFilmes.getBuscarFilme(idFilme)
  
-    response.status(dadosFilme.status_code)
-    response.json(dadosFilme)
+    response.status(dadosClassificacoes.status_code)
+    response.json(dadosClassificacoes)
 })
 
 //------------- DIRETORES --------------//
 
 app.get('/v2/acmefilmes/diretor/:id', cors(), async function(request, response, next){
      
-    let idDiretor = request.params.id;
-    console.log("ID do diretor recebido:", idDiretor);
-    let dadosDiretor = await controllerDiretores.getBuscarDiretor(idDiretor);
+    let id = request.params.id;
+    console.log("ID do diretor recebido:", id);
+    let dadosDiretor = await controllerDiretores.getBuscarDiretor(id);
 
     response.status(dadosDiretor.status_code);
     response.json(dadosDiretor);
@@ -158,25 +157,35 @@ app.get('/v2/acmefilmes/diretor/:id', cors(), async function(request, response, 
 
  // --------------- ATORES ---------------- //
 
-app.get('/v2/AcmeFilmes/atores/:id', cors(), async (request, response, next) => {
-    let idAtor = request.params.id;
-    
-    let dadosAtor = await controllerAtores.getBuscarAtor(idAtor);
-    
-    response.status(dadosAtor.status_code);
-    response.json(dadosAtor);
-});
+ app.get('/v2/AcmeFilmes/atores/:id', cors(), async (request, response, next) => {
+    try {
+        let idAtor = request.params.id;
+        
+        let dadosAtor = await controllerAtores.getBuscarAtorPorId(idAtor);
 
+        if (dadosAtor) {
+            response.status(200);
+            response.json(dadosAtor);
+
+        } else {
+            response.status(404).json({ message: 'Ator não encontrado' });
+        }
+
+    } catch (error) {
+        
+        console.error("Erro ao buscar ator:", error);
+        response.status(500).json({ message: 'Erro interno do servidor' });
+    }
+});
 // ----------------- CLASSIFICACAO ---------------- //
 
-app.get('/v2/acmefilmes/filme/:id', cors(), async function(request, response, next){
+app.get('/v2/acmefilmes/classificacoes/:id', cors(), async function(request, response, next){
     //Recebe o id encaminhado pela requisição 
-    let idFilme = request.params.id
-    console.log("ID do filme recebido:", idFilme);
-    let dadosFilme = await controllerFilmes.getBuscarFilme(idFilme)
+    let idClassificacao = request.params.id
+    let dadosClassificacoes = await controllerClassificacoes.getBuscarIdClass(idClassificacao)
  
-    response.status(dadosFilme.status_code)
-    response.json(dadosFilme)
+    response.status(dadosClassificacoes.status_code)
+    response.json(dadosClassificacoes)
 });
 
 // ------------------ USUARIO ----------------- //
@@ -215,19 +224,26 @@ app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request,
     response.json(resultDadosNovoFilme)
 })
 
-// ------------- DIRETORES ------------- //
-
-app.post('/v2/acmefilmes/diretor', cors(), bodyParserJSON, async function(request, response){
-    
+// ------------- DIRETORES ------------- // 
+app.post('/v2/acmefilmes/diretores', cors(), bodyParserJSON, async function(request, response) {
     let contentType = request.headers['content-type'];
-
     let dadosBody = request.body;
 
     let resultDadosNovoDiretor = await controllerDiretores.setInserirNovoDiretor(dadosBody, contentType);
 
-    response.status(resultDadosNovoDiretor.status_code);
-    response.json(resultDadosNovoDiretor);
-})
+    console.log("Resultado da função setInserirNovoDiretor:", resultDadosNovoDiretor); // Adicione esta linha para verificar o valor de resultDadosNovoDiretor
+
+    if (resultDadosNovoDiretor && resultDadosNovoDiretor.status_code) {
+        response.status(resultDadosNovoDiretor.status_code);
+        response.json(resultDadosNovoDiretor);
+    } else {
+
+        // Lida com o cenário em que resultDadosNovoDiretor é undefined ou não tem a propriedade status_code
+        console.error("Erro ao processar a resposta da função setInserirNovoDiretor:", resultDadosNovoDiretor);
+        response.status(500).json({ message: "Erro interno do servidor" }); // Retorna um status 500
+    }
+});
+
 
 // --------------- ATORES --------------- //
 
@@ -244,21 +260,17 @@ app.post('/v2/AcmeFilmes/atores', cors(), bodyParserJSON, async (request, respon
 
 // ------------ CLASSIFICACAO ---------------- //
 
-app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request, response){
-    // Obtém o tipo de conteúdo da requisição
-     let contentType = request.headers['content-type']
- 
-     // Obtém os dados do corpo da requisição
-     let dadosBody = request.body
- 
-      // Chama a função para inserir um novo filme
-     let resultDadosNovoFilme = await controllerFilmes.setInserirNovoFilme(dadosBody, contentType)
- 
-     // Define o status da resposta e envia os dados do novo filme como resposta
-     response.status(resultDadosNovoFilme.status_code)
-     response.json(resultDadosNovoFilme)
- });
+app.post('/v2/AcmeFilmes/classificacoes', cors(), bodyParserJSON, async function(request, response, next){
 
+    let contentType = request.headers['content-type']
+
+    let dadosBody = request.body
+
+    let resultDadosNovaClass = await controllerClassificacoes.setInserirNovaClassificacao(dadosBody, contentType)
+
+    response.status(resultDadosNovaClass.status_code)
+    response.json(resultDadosNovaClass)
+})
 
  // ---------------- USUARIO ------------------- //
 
@@ -282,18 +294,18 @@ app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request,
 app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,response,next){
 
     let idFilme = request.params.id
-    let dadosFilme = await controllerFilmes.setExcluirFilme(idFilme)
+    let dadosClassificacoes = await controllerFilmes.setExcluirFilme(idFilme)
 
     response.status(200)
-    response.json(dadosFilme)
+    response.json(dadosClassificacoes)
 })
 
 // -------------- DIRETORES --------------- //
 
-app.delete('/v1/acmefilmes/deleteDiretor/:id', cors(), async function (request, response, next){
-    let idDiretor = request.params.id;
+app.delete('/v1/acmefilmes/deleteDiretores/:id', cors(), async function (request, response, next){
+    let id = request.params.id;
 
-    let dadosExclusaoDiretor = await controllerDiretores.setExcluirDiretor(idDiretor);
+    let dadosExclusaoDiretor = await controllerDiretores.setExcluirDiretor(id);
 
     response.status(200);
     response.json(dadosExclusaoDiretor);
@@ -312,13 +324,13 @@ app.delete('/v1/acmefilmes/deleteAtor/:id', cors(), async (request, response) =>
 
 // ---------------- CLASSIFICACAO -------------- //
 
-app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,response,next){
+app.delete('/v1/acmefilmes/deleteClassificacoes/:id', cors (), async function (request,response,next){
 
-    let idFilme = request.params.id
-    let dadosFilme = await controllerFilmes.setExcluirFilme(idFilme)
+    let idClassificacao = request.params.id
+    let dadosClassificacoes = await controllerClassificacoes.setExcluirClassificacao(idClassificacao)
 
     response.status(200)
-    response.json(dadosFilme)
+    response.json(dadosClassificacoes)
 });
 
 // ----------------- USUARIO -------------------- //
@@ -335,6 +347,6 @@ app.delete('/v1/acmefilmes/deleteUsuario/:id', cors (), async function (request,
 
 
 
-app.listen('3030', function(){
+app.listen('8080', function(){
     console.log('API funcionando!!!')
 })

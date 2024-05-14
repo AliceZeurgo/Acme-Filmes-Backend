@@ -22,52 +22,38 @@ const selectAllDiretores = async function () {
 }
 
 
-async function deleteDiretores(id) {
+const deleteDiretores = async function (id) {
+
     try {
-        let idDiretor = id;
 
-        if (idDiretor == '' || idDiretor == undefined || isNaN(idDiretor) || idDiretor == null) {
-            return message.ERROR_INVALID_ID; // erro 400
-        } else {
-            let diretor = await diretoresDAO.selectByIdDiretor(idDiretor);
+        let sql = `DELETE FROM diretores WHERE id = ${id}`
 
-            if (diretor.length > 0) {
-                let diretorExcluido = await diretoresDAO.deleteDiretor(idDiretor);
-                
-                if (diretorExcluido) {
-                    return message.SUCCESS_DELETE_ITEM; // msg de sucesso 200
-                } else {
-                    return message.ERROR_INTERNAL_SERVER_DB; // erro 500
-                }
-            } else {
-                return message.ERROR_NOT_FOUND; // erro 404
-            }
-        }
-    } catch (error) {
-        console.error("Erro ao excluir diretor:", error);
-        return message.ERROR_INTERNAL_SERVER; // erro 500
-    }
-}
+        let rdDiretores = await prisma.$executeRawUnsafe(sql)
+        
+        return rdDiretores
+    } catch (error){
+        return false
+    }}
 
 
-const selectDiretoresById = async function(id){
+const setInserirNovoDiretorDAO = async function (dadosDiretor) {
     try {
-        let sql = `select * from tbl_diretor where id = ${id}`;
-        let resultDiretores = await prisma.$queryRawUnsafe(sql);
-            return resultDiretores;
-   
-        } catch (error) {
+        // Verifica se dadosDiretor é undefined ou vazio
+        if (!dadosDiretor || Object.keys(dadosDiretor).length === 0) {
+            console.error("Erro ao inserir diretor: Dados do diretor são inválidos");
             return false;
-           
         }
-}
 
-const inserirDiretor = async function (dadosDiretor) {
-    try {
+        // Verifica se todas as propriedades obrigatórias estão presentes
+        if (!dadosDiretor.nome_diretores || !dadosDiretor.biografia || !dadosDiretor.foto_diretor || !dadosDiretor.data_nascimento) {
+            console.error("Erro ao inserir diretor: Dados do diretor estão incompletos");
+            return false;
+        }
+
         let sql;
-        if (dadosDiretor.data_nascimento != '' &&
-            dadosDiretor.data_nascimento != null &&
-            dadosDiretor.data_nascimento != undefined
+        if (dadosDiretor.data_nascimento !== '' &&
+            dadosDiretor.data_nascimento !== null &&
+            dadosDiretor.data_nascimento !== undefined
         ) {
             sql = `INSERT INTO diretores (nome_diretores, biografia, data_nascimento, foto_diretor)
                    VALUES ('${dadosDiretor.nome_diretores}', 
@@ -94,12 +80,12 @@ const inserirDiretor = async function (dadosDiretor) {
     }
 }
 
+
 const selectByIdDiretor = async function (id) {
     try {
-        // SQL para pesquisa por ID
+
         let sql = `SELECT * FROM diretores WHERE id = ${id}`;
 
-        // Executa o SQL no BD e retorna o diretor
         let resultDiretor = await prisma.$queryRawUnsafe(sql);
         return resultDiretor;
 
@@ -113,5 +99,5 @@ module.exports ={
     selectAllDiretores,
     deleteDiretores,
     selectByIdDiretor,
-    setInserirNovoDiretor
+    setInserirNovoDiretorDAO
 }

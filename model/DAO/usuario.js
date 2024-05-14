@@ -13,7 +13,7 @@ const prisma = new PrismaClient()
 const insertUsuario = async function (dadosUsuario) {
     try {
         let sql;
-        if (dadosUsuario.administrador !== undefined && typeof dadosUsuario.administrador === 'boolean') {
+        if (dadosUsuario.administrador != undefined && typeof dadosUsuario.administrador === 'boolean') {
             sql = `INSERT INTO usuario (nome_usuario, senha_usuario, email, img_usuario, administrador)
                    VALUES ('${dadosUsuario.nome_usuario}', 
                            '${dadosUsuario.senha_usuario}', 
