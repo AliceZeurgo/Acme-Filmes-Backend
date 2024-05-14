@@ -111,6 +111,22 @@ app.get('/AcmeFilmes/classificacoes', async (request, response, next) => {
     }
 });
 
+// ------------------ USUARIO -------------------- //
+
+app.get('/AcmeFilmes/usuarios', async (request, response, next) => {
+    let dadosUsuarios = await controllerUsuarios.getListarUsuarios();
+
+    if (dadosUsuarios) {
+        response.json(dadosUsuarios);
+        response.status(200);
+    } else {
+        response.json({ message: 'Nenhum registro encontrado' });
+        response.status(400);
+    }
+});
+
+
+
 
 //------------------------------- ID -----------------------------------//
 
@@ -161,7 +177,20 @@ app.get('/v2/acmefilmes/filme/:id', cors(), async function(request, response, ne
  
     response.status(dadosFilme.status_code)
     response.json(dadosFilme)
-})
+});
+
+// ------------------ USUARIO ----------------- //
+
+app.get('/v2/acmefilmes/usuario/:id', cors(), async function(request, response, next){
+    let idUsuario = request.params.id;
+    console.log("ID do usuário recebido:", idUsuario);
+    
+    let dadosUsuario = await controllerUsuarios.getBuscarUsuario(idUsuario);
+ 
+    response.status(dadosUsuario.status_code);
+    response.json(dadosUsuario);
+});
+
 
 
 
@@ -230,6 +259,21 @@ app.post('/v2/acmefilmes/filme', cors(), bodyParserJSON, async function(request,
      response.json(resultDadosNovoFilme)
  });
 
+
+ // ---------------- USUARIO ------------------- //
+
+ app.post('/v2/acmefilmes/usuario', cors(), bodyParserJSON, async function(request, response){
+     let contentType = request.headers['content-type'];
+ 
+     let dadosBody = request.body;
+ 
+     let resultDadosNovoUsuario = await controllerUsuarios.setInserirNovoUsuario(dadosBody, contentType);
+ 
+     response.status(resultDadosNovoUsuario.status_code);
+     response.json(resultDadosNovoUsuario);
+ });
+ 
+
 //------------------------------------------- DELETAR -------------------------------------------------//
 
 //delete - ok
@@ -275,7 +319,20 @@ app.delete('/v1/acmefilmes/deleteFilme/:id', cors (), async function (request,re
 
     response.status(200)
     response.json(dadosFilme)
-})
+});
+
+// ----------------- USUARIO -------------------- //
+
+app.delete('/v1/acmefilmes/deleteUsuario/:id', cors (), async function (request,response,next){
+
+    let idUsuario = request.params.id;
+    let dadosUsuario = await controllerUsuarios.setExcluirUsuario(idUsuario);
+
+    response.status(200);
+    response.json(dadosUsuario);
+});
+
+
 
 
 app.listen('3030', function(){

@@ -1,76 +1,90 @@
-const { PrismaClient } = require('@prisma/client')
+/**********************************************************************************************************************************
+* Objetivo: Criar a intereação com o banco de dados MYSQL para fazer o CRUD de filmes                                             *
+* Data: 30/01/24                                                                                                                  *
+* Autor: Alice Zeurgo                                                                                                             *
+* Versão: 1.0                                                                                                                     * 
+**********************************************************************************************************************************/
 
+
+const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-// ALICE QUE FEZ
-
-const buscarTodosUsuarios = async function(){
+const insertUsuario = async function (dadosUsuario) {
     try {
-
-        let sql = `SELECT * FROM tbl_usuario`
-        let rsUsuarios = await prisma.$queryRawUnsafe(sql)
-        return rsUsuarios
-
+        let sql;
+        if (dadosUsuario.administrador !== undefined && typeof dadosUsuario.administrador === 'boolean') {
+            sql = `INSERT INTO usuario (nome_usuario, senha_usuario, email, img_usuario, administrador)
+                   VALUES ('${dadosUsuario.nome_usuario}', 
+                           '${dadosUsuario.senha_usuario}', 
+                           '${dadosUsuario.email}', 
+                           '${dadosUsuario.img_usuario}', 
+                           ${dadosUsuario.administrador});`;
+        } else {
+            return message.ERROR_REQUIRED_FIELDS;
+        }
+    
+        let result = await prisma.$executeRawUnsafe(sql);
+        if (result)
+            return true;
+        else
+            return false;
+    
     } catch (error) {
-
-        return false
-    }
-};
-
-const buscarUsuarioPorId = async (id) => {
-    try {
-        return await db.$queryRawUnsafe(`select * from tbl_usuario where id = ${id}`);
-    } catch (error) {
-        console.error("Erro ao buscar usuário por ID:", error);
+        console.error("Erro ao inserir usuário:", error);
         return false;
     }
 };
 
-const buscarUltimoIdUsuario = async () => {
+const selectAllUsuarios = async function () {
     try {
-        return await db.$queryRawUnsafe('select cast(id as decimal) from tbl_usuario order by id desc limit 1');
+        let sql = 'select * from usuario'
+        let resultUsuarios = await prisma.$queryRawUnsafe(sql)
+
+        if (resultUsuarios.length > 0) {
+            return resultUsuarios
+        } else {
+            return false
+        }
     } catch (error) {
-        console.error("Erro ao buscar o ID do último usuário:", error);
         return false;
     }
 };
 
-const inserirUsuario = async ({ nome, foto_url, email, senha, administrador }) => {
-    try {
-        const sql = `insert into tbl_usuario (nome, foto_url, email, senha, administrador) values ('${nome}', '${foto_url || ''}', '${email}', '${senha}', ${!!administrador})`;
-        return !!(await db.$executeRawUnsafe(sql));
-    } catch (error) {
-        console.error("Erro ao inserir um novo usuário:", error);
-        return false;
-    }
-};
+const deleteUsuario = async function(id){
 
-const deletarUsuario = async (id) => {
     try {
-        const query = `delete from tbl_usuario where id = ${id}`;
-        return await db.$queryRawUnsafe(query);
-    } catch (error) {
-        console.error("Erro ao deletar usuário:", error);
-        return false;
-    }
-};
+        let sql = `DELETE FROM usuario WHERE id = ${id}`; // Correção no nome da tabela
+        let result = await prisma.$executeRawUnsafe(sql);
 
-const atualizarUsuario = async ({ id, nome, foto_url, email, senha, administrador }) => {
-    try {
-        const sql = `update tbl_usuario set nome = '${nome}', foto_url = '${foto_url || ''}', email = '${email}', senha = '${senha}', administrador = ${!!administrador} where id = ${id}`;
-        return !!(await db.$executeRawUnsafe(sql));
+        // Retorna true se o usuário foi deletado com sucesso, ou false caso contrário
+        return !!result;
     } catch (error) {
-        console.error("Erro ao atualizar usuário:", error);
+        console.error("Erro ao excluir usuário:", error);
         return false;
     }
-};
+
+}
+
+const selectByIdUsuario = async function (id) {
+    try {
+        // SQL para pesquisa por ID
+        let sql = `SELECT * FROM usuario WHERE id = ${id}`;
+
+        // Executa o SQL no banco de dados e retorna o usuário
+        let resultUsuario = await prisma.$queryRawUnsafe(sql);
+        return resultUsuario;
+
+    } catch (error) {
+        return false;
+    }
+}
+
+
 
 module.exports = {
-    buscarTodosUsuarios,
-    buscarUsuarioPorId,
-    buscarUltimoIdUsuario,
-    inserirUsuario,
-    deletarUsuario,
-    atualizarUsuario
+    selectAllUsuarios,
+    selectByIdUsuario,
+    insertUsuario,
+    deleteUsuario
 };
